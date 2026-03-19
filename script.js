@@ -52,20 +52,29 @@ async function handleSearch(event) {
     resultContainer.innerHTML = "";
 
     if(!query) {
-        resultContainer.textContent = "Type something to search.....";
+        try {
+            const response = await fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${API_KEY}&limit=25&rating=r`);
+            
+            const data = await response.json();
+            displayGifs(data.data);
+        } catch (error) {
+            resultContainer.textContent = "Error fetching trending GIF's"
+            console.error("Error fetching trending GIF's", error)
+        }
         return;
     }
+resultContainer.textContent = "Searching...."
 
-    gifGallery.textContent = "Searching....";
-
-    try {
-        const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${query}&limit=20&rating=r`);
+try {
+    const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${query}&limit=20&rating=r`
+        );
         const data = await response.json();
         displayGifs(data.data);
-    } catch (error) {
-        gifGallery.textContent = "Error fetching search Gif's"
-        console.error("Error fetching search Gif's", error);
-    }
+}catch (error) {
+    resultContainer.textContent = "Error fetching search GIF's"
+    console.error("Error fetching search GIF's", error);
 }
+    }
+
 
 searchBar.addEventListener("input", debounce(handleSearch, 500));
