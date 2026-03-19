@@ -22,9 +22,25 @@ displayGifs(data.data);
 
 
 function displayGifs(gifs) {
-    gifGallery.innerHTML = gifs
-    .map(gif => `<img src="${gif.images.fixed_height.url}"alt="${gif.title}">`)
-    .join("")
+const resultContainer = document.getElementById("gifResults");
+resultContainer.innerHTML = "";
+gifs.forEach(gif => {
+
+    const imgUrl = gif.images?.fixed_height?.url 
+                    || gif.images?.downsized?.url 
+                    || gif.images?.original?.url;
+
+    if (imgUrl) {
+    const img = document.createElement("img");
+    img.src = imgUrl;
+    img.alt = gif.title || "GIF";
+    resultContainer.appendChild(img);
+    } else {
+        const placeholder = document.createElement("div");
+        placeholder.textContent = "GIF not available";
+        resultContainer.appendChild(placeholder);
+    }
+});
 }
 
 loadTrendingGifs();
@@ -47,9 +63,11 @@ loadTrendingGifs();
 
 async function handleSearch(event) {
     const query = event.target.value.trim();
-    const resultContainer = document.getElementById("gifGallery");
+    const resultContainer = document.getElementById("gifResults");
+    const spinner = document.getElementById("loadingSpinner");
 
     resultContainer.innerHTML = "";
+    spinner.style.display = "block";
 
     if(!query) {
         try {
@@ -60,10 +78,11 @@ async function handleSearch(event) {
         } catch (error) {
             resultContainer.textContent = "Error fetching trending GIF's"
             console.error("Error fetching trending GIF's", error)
+        } finally {
+            spinner.style.display = "none";
         }
         return;
     }
-resultContainer.textContent = "Searching...."
 
 try {
     const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${query}&limit=20&rating=r`
@@ -73,6 +92,8 @@ try {
 }catch (error) {
     resultContainer.textContent = "Error fetching search GIF's"
     console.error("Error fetching search GIF's", error);
+} finally {
+    spinner.style.display = "none";
 }
     }
 

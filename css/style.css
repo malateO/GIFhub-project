@@ -136,13 +136,39 @@ body {
   top: 8em;
 }
 
-.gif-gallery {
+#gifResults {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 15px;
   padding: 10px;
-  position: relative;
-  top: 10em;
   max-width: 100%;
   margin: 0 auto;
+}
+
+.gif-gallery {
+  position: relative;
+  min-height: 200px;
+  top: 10em;
+}
+
+.spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
