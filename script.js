@@ -3,6 +3,15 @@ const API_KEY = "HWjUB90d31Rn3R81AZn7AEIsGSnjEYCr";
 const gifGallery = document.getElementById('gifGallery');
 const searchBar = document.getElementById('searchBar');
 
+
+function debounce(func, delay) {
+    let timeout;
+    return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
 async function loadTrendingGifs() {
 const response = await fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${API_KEY}&limit=25&rating=pg-13`);
 
@@ -20,19 +29,52 @@ function displayGifs(gifs) {
 
 loadTrendingGifs();
 
-searchBar.addEventListener('input', async() => {
-    const query = searchBar.value.trim();
+// searchBar.addEventListener('input', async() => {
+//     const query = searchBar.value.trim();
 
-    if (query.length > 2) {
+//     if (query.length > 2) {
+//         try {
+//             const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${query}&limit=20&rating=r`);
+//             const data = await response.json();
+//             displayGifs(data.data);
+//         } catch (error) {
+//             console.error("Error fetching search GIF's", error);
+//         }
+//     } else {
+//         loadTrendingGifs();
+//     }
+// });
+
+async function handleSearch(event) {
+    const query = event.target.value.trim();
+    const resultContainer = document.getElementById("gifGallery");
+
+    resultContainer.innerHTML = "";
+
+    if(!query) {
         try {
-            const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${query}&limit=20&rating=r`);
+            const response = await fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${API_KEY}&limit=25&rating=r`);
+            
             const data = await response.json();
             displayGifs(data.data);
         } catch (error) {
-            console.error("Error fetching search GIF's", error);
+            resultContainer.textContent = "Error fetching trending GIF's"
+            console.error("Error fetching trending GIF's", error)
         }
-    } else {
-        loadTrendingGifs();
+        return;
     }
-});
+resultContainer.textContent = "Searching...."
 
+try {
+    const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${query}&limit=20&rating=r`
+        );
+        const data = await response.json();
+        displayGifs(data.data);
+}catch (error) {
+    resultContainer.textContent = "Error fetching search GIF's"
+    console.error("Error fetching search GIF's", error);
+}
+    }
+
+
+searchBar.addEventListener("input", debounce(handleSearch, 500));
