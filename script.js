@@ -45,21 +45,6 @@ gifs.forEach(gif => {
 
 loadTrendingGifs();
 
-// searchBar.addEventListener('input', async() => {
-//     const query = searchBar.value.trim();
-
-//     if (query.length > 2) {
-//         try {
-//             const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${query}&limit=20&rating=r`);
-//             const data = await response.json();
-//             displayGifs(data.data);
-//         } catch (error) {
-//             console.error("Error fetching search GIF's", error);
-//         }
-//     } else {
-//         loadTrendingGifs();
-//     }
-// });
 
 async function handleSearch(event) {
     const query = event.target.value.trim();
@@ -67,34 +52,31 @@ async function handleSearch(event) {
     const spinner = document.getElementById("loadingSpinner");
 
     resultContainer.innerHTML = "";
-    spinner.style.display = "block";
+    if (spinner) spinner.style.display = "block"
 
-    if(!query) {
-        try {
-            const response = await fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${API_KEY}&limit=25&rating=r`);
-            
-            const data = await response.json();
-            displayGifs(data.data);
-        } catch (error) {
-            resultContainer.textContent = "Error fetching trending GIF's"
-            console.error("Error fetching trending GIF's", error)
-        } finally {
-            spinner.style.display = "none";
+    try {
+        let response;
+        if (!query) {
+            response = await fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${API_KEY}&limit=25&rating=pg-13`);
+        } else {
+            response = await fetch (`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${encodeURIComponent(query)}&limit=20&rating=pg-13`);
         }
-        return;
-    }
 
-try {
-    const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${query}&limit=20&rating=r`
-        );
         const data = await response.json();
-        displayGifs(data.data);
-}catch (error) {
-    resultContainer.textContent = "Error fetching search GIF's"
-    console.error("Error fetching search GIF's", error);
-} finally {
-    spinner.style.display = "none";
-}
+        if (!query) {
+            displayGifs(data.data);
+        }else if (!data.data || data.data.length === 0) {
+            resultContainer.textContent = "No GIF's found. Try another search!";
+        } else {
+            displayGifs(data.data);
+        }
+
+    } catch (error) {
+        resultContainer.textContent = "Error fetching GIF's";
+        console.error("Error fetching GIF's",error);
+    } finally {
+        if (spinner) spinner.style.display = "none";
+    }
     }
 
 
