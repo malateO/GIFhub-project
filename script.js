@@ -66,7 +66,22 @@ async function handleSearch(event) {
         if (!query) {
             displayGifs(data.data);
         }else if (!data.data || data.data.length === 0) {
-            resultContainer.textContent = "No GIF's found. Try another search!";
+            resultContainer.innerHTML = ""
+            
+            const message = document.createElement("div");
+            message.className = "no-results";
+            
+            const icon = document.createElement("span");
+            icon.className = "material-symbols-outlined";
+            icon.textContent = "search";
+
+            const text = document.createElement("span");
+            text.textContent = "No GIF's found. Try another search!";
+
+            message.appendChild(icon);
+            message.appendChild(text);
+            
+            resultContainer.appendChild(message);
         } else {
             displayGifs(data.data);
         }

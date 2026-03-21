@@ -172,3 +172,20 @@ body {
     transform: translate(-50%, -50%) rotate(360deg);
   }
 }
+
+.no-results {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  font-size: 1.2em;
+  color: #666;
+  min-height: 200px;
+}
+
+.no-results .material-symbols-outlined {
+  font-size: 28px;
+  color: #999;
+}
