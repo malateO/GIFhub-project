@@ -1,9 +1,11 @@
 const API_KEY = "HWjUB90d31Rn3R81AZn7AEIsGSnjEYCr";
 
+let lastDisplayedGifs = [];
+
 const gifGallery = document.getElementById('gifGallery');
 const searchBar = document.getElementById('searchBar');
 
-
+// 1. Utility
 function debounce(func, delay) {
     let timeout;
     return function (...args) {
@@ -12,38 +14,13 @@ function debounce(func, delay) {
     };
 }
 
+// 2. Fetching
 async function loadTrendingGifs() {
 const response = await fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${API_KEY}&limit=25&rating=pg-13`);
 
 const data = await response.json();
 displayGifs(data.data);
 }
-
-
-
-function displayGifs(gifs) {
-const resultContainer = document.getElementById("gifResults");
-resultContainer.innerHTML = "";
-gifs.forEach(gif => {
-
-    const imgUrl = gif.images?.fixed_height?.url 
-                    || gif.images?.downsized?.url 
-                    || gif.images?.original?.url;
-
-    if (imgUrl) {
-    const img = document.createElement("img");
-    img.src = imgUrl;
-    img.alt = gif.title || "GIF";
-    resultContainer.appendChild(img);
-    } else {
-        const placeholder = document.createElement("div");
-        placeholder.textContent = "GIF not available";
-        resultContainer.appendChild(placeholder);
-    }
-});
-}
-
-loadTrendingGifs();
 
 
 async function handleSearch(event) {
@@ -95,4 +72,88 @@ async function handleSearch(event) {
     }
 
 
+// 3. Display
+function displayGifs(gifs) {
+lastDisplayedGifs = gifs;
+
+const resultContainer = document.getElementById("gifResults");
+resultContainer.innerHTML = "";
+gifs.forEach(gif => {
+
+    const imgUrl = gif.images?.fixed_height?.url 
+                    || gif.images?.downsized?.url 
+                    || gif.images?.original?.url;
+
+    if (imgUrl) {
+    const gifWrapper = document.createElement("div");
+    gifWrapper.className = "gif-item";
+
+    const img = document.createElement("img");
+    img.src = imgUrl;
+    img.alt = gif.title || "GIF";
+
+    const favButton = document.createElement("button");
+    favButton.className = "fav-btn";
+
+    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    const isFavorited = favorites.some(fav => fav.id === gif.id);
+    if (isFavorited) {
+        favButton.classList.add("active");
+        favButton.textContent = "❤️";
+    } else {
+        favButton.textContent = "🤍";
+    }
+
+
+    favButton.textContent = isFavorited ? "❤️" : "🤍";
+    favButton.addEventListener("click", () => toggleFavorite(gif));
+
+    gifWrapper.appendChild(img);
+    gifWrapper.appendChild(favButton);
+    resultContainer.appendChild(gifWrapper);
+    } else {
+        const placeholder = document.createElement("div");
+        placeholder.textContent = "GIF not available";
+        resultContainer.appendChild(placeholder);
+    }
+});
+}
+
+function displayFavorites() {
+    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    const favContainer = document.getElementById("favorites");
+    favContainer.innerHTML = "";
+
+    favorites.forEach(gif => {
+        const img = document.createElement("img");
+        img.src = gif.images.fixed_height.url;
+        img.alt = gif.title || "Favorite GIF";
+        favContainer.appendChild(img);
+        })
+}
+
+
+// 4. Interactions
+function toggleFavorite(gif) {
+    let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    const exists = favorites.find(fav => fav.id === gif.id);
+
+    if (exists) {
+        favorites = favorites.filter(fav => fav.id !== gif.id);
+    } else {
+        favorites.push(gif);
+    }
+
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    displayFavorites();
+
+
+        displayGifs(lastDisplayedGifs);
+}
+
+
+
+// 5. Event Listeners
+loadTrendingGifs();
+displayFavorites();
 searchBar.addEventListener("input", debounce(handleSearch, 500));
