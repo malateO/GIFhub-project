@@ -1,25 +1,19 @@
+/* Global reset */
 * {
-  font-family:
-    Outfit,
-    Outfit Fallback,
-    system-ui,
-    arial;
-  font-style: normal;
+  font-family: Outfit, system-ui, Arial, sans-serif;
   margin: 0;
   padding: 0;
 }
 
 body {
   background-color: #f6f1f1;
-  padding: 0;
-  margin: 0;
-  overflow-x: hidden;
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
+/* Navbar styling */
 .navbar {
-  padding-left: 15px;
-  padding-right: 15px;
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  padding: 15px;
+  font-family: "Gill Sans", Calibri, "Trebuchet MS", sans-serif;
 }
 
 .navdiv {
@@ -32,8 +26,6 @@ body {
   text-decoration: none;
   font-size: 30px;
   font-weight: 600;
-  position: relative;
-  left: 25px;
 }
 
 .navlist {
@@ -48,53 +40,38 @@ body {
   color: black;
 }
 
-.title-search {
-  position: relative;
-  bottom: 4em;
-}
-
-.body-title {
-  position: relative;
-  top: 150px;
+/* Hero section */
+.hero {
+  text-align: center;
+  margin: 60px 0 30px; /* spacing instead of position hacks */
 }
 
 .bodymain-title {
-  display: flex;
-  justify-content: center;
-  font-size: 4em;
-  text-align: center;
+  font-size: 3em;
   color: rgb(190, 6, 190);
 }
 
 .bodymain-subtitle {
-  display: flex;
-  justify-content: center;
-  text-align: center;
   font-size: 20px;
-  position: relative;
-  top: 15px;
   color: gray;
+  margin-top: 10px;
 }
 
+/* Search bar */
 .search-block {
   display: flex;
   justify-content: center;
-  align-items: center;
-  position: relative;
-  top: 11em;
+  margin: 40px 0; /* spacing instead of top offset */
 }
 
 .search {
-  --padding: 24px;
-
   display: flex;
   align-items: center;
-  width: max-content;
   border-radius: 48px;
-  padding: var(--padding);
+  padding: 12px 20px;
   background: #d0d0d0;
-  width: 70vmax;
-  transition: background 0.25;
+  width: 70%;
+  max-width: 800px;
 }
 
 .search:focus-within {
@@ -102,42 +79,36 @@ body {
 }
 
 .search-box {
-  font-size: 20px;
+  font-size: 18px;
   font-family: "Lexend", sans-serif;
   color: #000000b0;
-  margin-left: var(--padding);
+  margin-left: 10px;
   outline: none;
   background: transparent;
   border: none;
   flex: 1;
 }
 
-.search-box::placeholder,
-.material-symbols-outlined {
-  color: rgba(2, 2, 2, 0.5);
-  transition: color 0.3s ease;
-}
-
-.search-box:focus {
-  border-color: #e090e6;
-  outline: none;
-}
-
-.search-box:focus::placeholder {
-  color: #e090e6;
-}
-
+/* Section headers */
 .feature-header {
   text-align: center;
-  margin: 20px 0;
+  margin: 40px 0 20px; /* clean spacing */
   font-size: 22px;
   color: #333;
-  position: relative;
-  top: 8em;
 }
 
+/* Gallery wrapper (holds spinner + results) */
+/* CHANGE: removed grid here, because gif-gallery is just a wrapper */
+.gif-gallery {
+  position: relative; /* needed for spinner centering */
+  min-height: 200px;
+  padding: 10px;
+}
+
+/* Actual grid for Feature Gifs */
+/* CHANGE: grid applied only to #gifResults, so GIFs align properly */
 #gifResults {
-  display: grid;
+  display: grid; /* ensures grid layout */
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 15px;
   padding: 10px;
@@ -145,12 +116,29 @@ body {
   margin: 0 auto;
 }
 
-.gif-gallery {
-  position: relative;
-  min-height: 200px;
-  top: 10em;
+/* Grid for Favorites section */
+#favorites {
+  display: grid; /* consistent grid for favorites */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  padding: 10px;
 }
 
+/* Grid for Profile section */
+#profileFavorites {
+  display: grid; /* consistent grid for profile */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  padding: 10px;
+}
+
+/* Grid children (Gallery + Favorites + Profile) */
+.gif-item,
+.profile-gif {
+  position: relative; /* needed for heart button positioning */
+}
+
+/* Loading spinner */
 .spinner {
   position: absolute;
   top: 50%;
@@ -173,28 +161,7 @@ body {
   }
 }
 
-.no-results {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  text-align: center;
-  font-size: 1.2em;
-  color: #666;
-  min-height: 200px;
-}
-
-.no-results .material-symbols-outlined {
-  font-size: 28px;
-  color: #999;
-}
-
-.gif-item {
-  position: relative;
-  display: inline-block;
-}
-
+/* Favorite button */
 .fav-btn {
   position: absolute;
   bottom: 8px;
