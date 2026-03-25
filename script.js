@@ -42,10 +42,16 @@ async function handleSearch(event) {
 
         const data = await response.json();
         if (!query) {
+            resultContainer.classList.add("grid");
             displayGifs(data.data);
         } else if (!data.data || data.data.length === 0) {
             // Show "no results" message
-            resultContainer.innerHTML = "";
+            resultContainer.classList.remove("grid");
+            resultContainer.style.display = "flex";
+            resultContainer.style.alignItems = "center";
+            resultContainer.style.justifyContent = "center";
+            resultContainer.style.minHeight = "200px";
+
             const message = document.createElement("div");
             message.className = "no-results";
 

@@ -43,35 +43,37 @@ body {
 /* Hero section */
 .hero {
   text-align: center;
-  margin: 60px 0 30px; /* spacing instead of position hacks */
+  margin: 30px 0 20px; /* spacing instead of position hacks */
 }
 
 .bodymain-title {
-  font-size: 3em;
+  font-size: 2.5em;
   color: rgb(190, 6, 190);
 }
 
 .bodymain-subtitle {
-  font-size: 20px;
+  font-size: 18px;
   color: gray;
   margin-top: 10px;
 }
 
 /* Search bar */
 .search-block {
-  display: flex;
-  justify-content: center;
-  margin: 40px 0; /* spacing instead of top offset */
+  width: 100%;
+  margin: 60px auto;
+  padding: 0 40px;
+  box-sizing: border-box;
 }
 
 .search {
   display: flex;
   align-items: center;
-  border-radius: 48px;
-  padding: 12px 20px;
+  border-radius: 32px;
+  padding: 14px 24px;
   background: #d0d0d0;
-  width: 70%;
-  max-width: 800px;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
 .search:focus-within {
@@ -79,10 +81,11 @@ body {
 }
 
 .search-box {
-  font-size: 18px;
+  font-size: 22px;
+  font-size: 20px;
   font-family: "Lexend", sans-serif;
   color: #000000b0;
-  margin-left: 10px;
+  margin-left: 24px;
   outline: none;
   background: transparent;
   border: none;
@@ -92,8 +95,8 @@ body {
 /* Section headers */
 .feature-header {
   text-align: center;
-  margin: 40px 0 20px; /* clean spacing */
-  font-size: 22px;
+  margin: 20px 0 10px; /* clean spacing */
+  font-size: 20px;
   color: #333;
 }
 
@@ -108,12 +111,26 @@ body {
 /* Actual grid for Feature Gifs */
 /* CHANGE: grid applied only to #gifResults, so GIFs align properly */
 #gifResults {
-  display: grid; /* ensures grid layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
+}
+
+#gifResults.grid {
+  display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 15px;
   padding: 10px;
-  max-width: 100%;
-  margin: 0 auto;
+}
+
+.no-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #555;
+  font-size: 20px;
 }
 
 /* Grid for Favorites section */
