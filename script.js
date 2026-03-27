@@ -2,6 +2,12 @@ const API_KEY = "HWjUB90d31Rn3R81AZn7AEIsGSnjEYCr";
 
 let lastDisplayedGifs = [];
 
+function getUserProfile() {
+    return null;
+}
+
+const userProfile = getUserProfile();
+
 const gifGallery = document.getElementById('gifGallery');
 const searchBar = document.getElementById('searchBar');
 
@@ -15,82 +21,64 @@ function debounce(func, delay) {
 }
 
 // 2. Fetching
-async function loadTrendingGifs() {
-    // Fetch trending GIFs from Giphy API
-    const response = await fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${API_KEY}&limit=25&rating=pg-13`);
-    const data = await response.json();
-    displayGifs(data.data); // Display in gallery section
+async function fetchGifs(query) {
+    const endpoint = query
+    ? `https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${encodeURIComponent(query)}&limit=20&rating=pg-13`
+    : `https://api.giphy.com/v1/gifs/trending?api_key=${API_KEY}&limit=25&rating=pg-13`;
+
+    const response = await fetch(endpoint);
+    return response.json();
 }
 
 async function handleSearch(event) {
     const query = event.target.value.trim();
-    const resultContainer = document.getElementById("gifResults");
     const spinner = document.getElementById("loadingSpinner");
-
-    resultContainer.innerHTML = "";
-    if (spinner) spinner.style.display = "block"; // Show spinner while loading
+    if (spinner) spinner.style.display = "block";
 
     try {
-        let response;
-        if (!query) {
-            // Default to trending if search is empty
-            response = await fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${API_KEY}&limit=25&rating=pg-13`);
-        } else {
-            // Search endpoint
-            response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${encodeURIComponent(query)}&limit=20&rating=pg-13`);
-        }
-
-        const data = await response.json();
-        if (!query) {
-            resultContainer.classList.add("grid");
-            displayGifs(data.data);
-        } else if (!data.data || data.data.length === 0) {
-            // Show "no results" message
-            resultContainer.classList.remove("grid");
-            resultContainer.style.display = "flex";
-            resultContainer.style.alignItems = "center";
-            resultContainer.style.justifyContent = "center";
-            resultContainer.style.minHeight = "200px";
-
-            const message = document.createElement("div");
-            message.className = "no-results";
-
-            const icon = document.createElement("span");
-            icon.className = "material-symbols-outlined";
-            icon.textContent = "search";
-
-            const text = document.createElement("span");
-            text.textContent = "No GIF's found. Try another search!";
-
-            message.appendChild(icon);
-            message.appendChild(text);
-            resultContainer.appendChild(message);
-        } else {
-            displayGifs(data.data);
-        }
-
-    } catch (error) {
-        resultContainer.textContent = "Error fetching GIF's";
+        const data = await fetchGifs(query);
+        displayGifs(data.data);
+    }catch (error) {
         console.error("Error fetching GIF's", error);
+        document.getElementById("gifResults").textContent = "Error fetching GIF's";
     } finally {
-        if (spinner) spinner.style.display = "none"; // Hide spinner
+        if (spinner) spinner.style.display = "none";
     }
 }
 
 // 3. Display
 function displayGifs(gifs) {
-    lastDisplayedGifs = gifs; // Save last displayed for refresh
-
+    lastDisplayedGifs = gifs;
     const resultContainer = document.getElementById("gifResults");
     resultContainer.innerHTML = "";
-    gifs.forEach(gif => {
-        const imgUrl = gif.images?.fixed_height?.url 
-                    || gif.images?.downsized?.url 
-                    || gif.images?.original?.url;
 
-        if (imgUrl) {
+    if (!gifs || gifs.length === 0) {
+        resultContainer.classList.remove("grid");
+
+        const message = document.createElement("div");
+        message.className = "no-results";
+
+        const icon = document.createElement("span");
+        icon.className = "material-symbols-outlined"
+        icon.textContent = "search";
+
+        const text = document.createElement("span");
+        text.textContent = "No GIF's found. Try another search!";
+
+        message.appendChild(icon);
+        message.appendChild(text);
+        resultContainer.appendChild(message);
+        return;
+    }
+
+    resultContainer.classList.add("grid");
+
+    gifs.forEach(gif => {
+        const imgUrl = gif.images?.fixed_height?.url || gif.images?.downsized?.url || gif.images?.original?.url;
+
+        if(imgUrl) {
             const gifWrapper = document.createElement("div");
-            gifWrapper.className = "gif-item"; // Matches CSS grid layout
+            gifWrapper.className = "gif-item";
 
             const img = document.createElement("img");
             img.src = imgUrl;
@@ -102,7 +90,6 @@ function displayGifs(gifs) {
             const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
             const isFavorited = favorites.some(fav => fav.id === gif.id);
 
-            // Toggle heart icon based on favorite status
             favButton.textContent = isFavorited ? "❤️" : "🤍";
             if (isFavorited) favButton.classList.add("active");
 
@@ -111,22 +98,20 @@ function displayGifs(gifs) {
             gifWrapper.appendChild(img);
             gifWrapper.appendChild(favButton);
             resultContainer.appendChild(gifWrapper);
-        } else {
-            const placeholder = document.createElement("div");
-            placeholder.textContent = "GIF not available";
-            resultContainer.appendChild(placeholder);
         }
     });
 }
 
-function displayFavorites() {
+function displayFavorites(containerId, wrapperClass) {
+    if (!userProfile) return;
+
     const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    const favContainer = document.getElementById("favorites");
-    favContainer.innerHTML = "";
+    const container = document.getElementById(containerId);
+    container.innerHTML = "";
 
     favorites.forEach(gif => {
         const gifWrapper = document.createElement("div");
-        gifWrapper.className = "gif-item"; // Consistent with gallery
+        gifWrapper.className = wrapperClass;
 
         const img = document.createElement("img");
         img.src = gif.images.fixed_height.url;
@@ -141,35 +126,10 @@ function displayFavorites() {
 
         gifWrapper.appendChild(img);
         gifWrapper.appendChild(favButton);
-        favContainer.appendChild(gifWrapper);
+        container.appendChild(gifWrapper);
     });
 }
 
-function displayProfileFavorites() {
-    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    const profileContainer = document.getElementById("profileFavorites");
-    profileContainer.innerHTML = "";
-
-    favorites.forEach(gif => {
-        const gifWrapper = document.createElement("div");
-        gifWrapper.className = "profile-gif"; // Profile-specific wrapper
-
-        const img = document.createElement("img");
-        img.src = gif.images.fixed_height.url;
-        img.alt = gif.title || "Favorite GIF";
-
-        const favButton = document.createElement("button");
-        favButton.className = "fav-btn active";
-        favButton.textContent = "❤️";
-
-        // Toggle works here too
-        favButton.addEventListener("click", () => toggleFavorite(gif));
-
-        gifWrapper.appendChild(img);
-        gifWrapper.appendChild(favButton);
-        profileContainer.appendChild(gifWrapper);
-    });
-}
 
 // 4. Interactions
 function toggleFavorite(gif) {
@@ -187,14 +147,16 @@ function toggleFavorite(gif) {
     localStorage.setItem("favorites", JSON.stringify(favorites));
 
     // Refresh all views to stay in sync
-    displayFavorites();
-    displayProfileFavorites();
-    displayGifs(lastDisplayedGifs);
+if (userProfile) {
+    displayFavorites("profileFavorites", "profile-gif");
+}
+displayGifs(lastDisplayedGifs);
 }
 
 // 5. Event Listeners
-loadTrendingGifs();          // Load initial gallery
-displayFavorites();          // Show favorites on page load
-displayProfileFavorites();   // Show profile favorites on page load
+fetchGifs("").then(data => displayGifs(data.data));
+if (userProfile) {
+    displayFavorites("profileFavorites", "profile-gif");
+}
 searchBar.addEventListener("input", debounce(handleSearch, 500)); // Search with debounce
 
