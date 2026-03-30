@@ -1,15 +1,49 @@
 const API_KEY = "HWjUB90d31Rn3R81AZn7AEIsGSnjEYCr";
 
+let userProfile = null; //starts logged out
 let lastDisplayedGifs = [];
 
-function getUserProfile() {
-    return null;
-}
-
-const userProfile = getUserProfile();
 
 const gifGallery = document.getElementById('gifGallery');
 const searchBar = document.getElementById('searchBar');
+
+
+//-------Account Stub-------//
+function createStubUser(username) {
+    return {
+        username: username,
+        email: `${username}@example.com`,
+        favorites:[]
+    }
+}
+
+function login(username, password) {
+    //ignore password for now
+    userProfile = createStubUser(username);
+    updateUI();
+}
+
+function logout() {
+    userProfile = null;
+    updateUI();
+}
+
+function createAccount(username, password) {
+    userProfile = createStubUser(username);
+    updateUI();
+}
+
+function updateUI() {
+    const profileSection = document.getElementById("profile");
+    if(profileSection) {
+        if(userProfile) {
+            profileSection.style.display = "block";
+            profileSection.querySelector("h3").textContent = `Welcome, ${userProfile.username}`;
+        } else {
+            profileSection.style.display = "none";
+        }
+    }
+}
 
 // 1. Utility
 function debounce(func, delay) {
@@ -102,33 +136,33 @@ function displayGifs(gifs) {
     });
 }
 
-function displayFavorites(containerId, wrapperClass) {
-    if (!userProfile) return;
+// function displayFavorites(containerId, wrapperClass) {
+//     if (!userProfile) return;
 
-    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    const container = document.getElementById(containerId);
-    container.innerHTML = "";
+//     const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+//     const container = document.getElementById(containerId);
+//     container.innerHTML = "";
 
-    favorites.forEach(gif => {
-        const gifWrapper = document.createElement("div");
-        gifWrapper.className = wrapperClass;
+//     favorites.forEach(gif => {
+//         const gifWrapper = document.createElement("div");
+//         gifWrapper.className = wrapperClass;
 
-        const img = document.createElement("img");
-        img.src = gif.images.fixed_height.url;
-        img.alt = gif.title || "Favorite GIF";
+//         const img = document.createElement("img");
+//         img.src = gif.images.fixed_height.url;
+//         img.alt = gif.title || "Favorite GIF";
 
-        const favButton = document.createElement("button");
-        favButton.className = "fav-btn active";
-        favButton.textContent = "❤️";
+//         const favButton = document.createElement("button");
+//         favButton.className = "fav-btn active";
+//         favButton.textContent = "❤️";
 
-        // Allow removing directly from Favorites
-        favButton.addEventListener("click", () => toggleFavorite(gif));
+//         // Allow removing directly from Favorites
+//         favButton.addEventListener("click", () => toggleFavorite(gif));
 
-        gifWrapper.appendChild(img);
-        gifWrapper.appendChild(favButton);
-        container.appendChild(gifWrapper);
-    });
-}
+//         gifWrapper.appendChild(img);
+//         gifWrapper.appendChild(favButton);
+//         container.appendChild(gifWrapper);
+//     });
+// }
 
 
 // 4. Interactions
@@ -152,6 +186,30 @@ if (userProfile) {
 }
 displayGifs(lastDisplayedGifs);
 }
+
+//login/signup
+function openAuthPopup() {
+    document.getElementById("auth-popup").style.display = "flex";
+}
+
+function closeAuthPopup() {
+    document.getElementById("auth-popup").style.display = "none";
+}
+
+function handleAuth(event) {
+    event.preventDefault();
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+    login(username, password); //user your stub login
+}
+
+function signup() {
+    const username = document.getElementById("usernae").value;
+    const password = document.getElementById("password").value;
+    createAccount(username, password); //user your stub signup
+    closeAuthPopup();
+}
+
 
 // 5. Event Listeners
 fetchGifs("").then(data => displayGifs(data.data));
