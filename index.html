@@ -55,11 +55,29 @@
       </section>
       <!-- Home section -->
       <section id="home-page">
-        <h2 class="feature-header">Feature Gifs</h2>
-        <div class="gif-gallery" id="gifGallery">
-          <div id="loadingSpinner" class="spinner" style="display: none"></div>
-          <div id="gifResults"></div>
-        </div>
+        <section id="feature-section">
+          <h2 class="feature-header">Feature Gifs</h2>
+          <div class="gif-gallery" id="gifGallery">
+            <div
+              id="loadingSpinner"
+              class="spinner"
+              style="display: none"
+            ></div>
+            <div id="gifResults"></div>
+          </div>
+        </section>
+
+        <section id="profile" style="display: none">
+          <h2 class="feature-header">Your Account</h2>
+          <h3 id="welcomeMessage">Welcome, Guess</h3>
+          <p id="profileTagline"></p>
+          <p id="profileEmail"></p>
+
+          <button onclick="logout()" class="btn-logout">Logout</button>
+
+          <h3>Your Favorites</h3>
+          <div id="profileFavorites" class="grid"></div>
+        </section>
       </section>
     </main>
 
