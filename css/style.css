@@ -6,7 +6,7 @@
 }
 
 body {
-  background-color: #f6f1f1;
+  background: linear-gradient(135deg, #f6e6ff, #e0b3ff, #c68cff);
   overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
@@ -55,6 +55,13 @@ body {
 .auth-icon .material-symbol-oultined {
   font-size: 28px;
   color: black;
+}
+
+.login-status {
+  margin-left: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #6a0dad;
 }
 
 /* Hero section */
@@ -128,6 +135,17 @@ body {
 /* Actual grid for Feature Gifs */
 /* CHANGE: grid applied only to #gifResults, so GIFs align properly */
 #gifResults {
+  display: grid; /* use grid consistently */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  padding: 10px;
+  justify-items: center; /* center items inside each grid cell */
+  align-items: start; /* align items to the top of each cell */
+  width: 100%;
+  box-sizing: border-box; /* prevent overflow */
+}
+
+#gifResults.flex {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -135,11 +153,62 @@ body {
   width: 100%;
 }
 
+.no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
+  color: #4a004a;
+  font-size: 20px;
+
+  background: linear-gradient(135deg, #f9f0ff, #e6ccff, #d1a3ff);
+  border-radius: 12px;
+  padding: 30px 40px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.gif-item,
+.profile-gif {
+  width: 100%;
+  max-width: 200px; /* keeps them neat */
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f9f0ff; /* playful purple card background */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
 #gifResults.grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 15px;
   padding: 10px;
+}
+
+#feature-section,
+#profile {
+  background: linear-gradient(135deg, #f9f0ff, #e6ccff, #d1a3ff);
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#profile h2 {
+  color: #6a0dad;
+  margin-bottom: 10px;
+}
+
+#profile h3 {
+  margin-top: 10px;
+  color: #4a004a;
+}
+
+#profileTagline {
+  font-style: italic;
+  color: #9b59b6;
+  margin-bottom: 10px;
 }
 
 .no-results {
@@ -339,13 +408,16 @@ body {
 }
 
 .btn-logout {
-  background: linear-gradient(135deg, #6a0dad, #9b59b6);
+  background: linear-gradient(135deg, #a64dff, #9b59b6);
   color: #fff;
   padding: 10px 16px;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   margin: 15px 0;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.3s ease;
 }
 
 .btn-logout:hover {

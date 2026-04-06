@@ -28,6 +28,7 @@ function login(username, password) {
   //ignore password for now
   userProfile = createStubUser(username);
   updateUI();
+  closeAuthPopup();
 }
 
 function logout() {
@@ -38,6 +39,7 @@ function logout() {
 function createAccount(username, password) {
   userProfile = createStubUser(username);
   updateUI();
+  closeAuthPopup();
 }
 
 function getRandomTagline() {
@@ -47,19 +49,27 @@ function getRandomTagline() {
 
 function updateUI() {
   const profileSection = document.getElementById("profile");
-  if (profileSection) {
-    if (userProfile) {
-      profileSection.style.display = "block";
-      profileSection.querySelector("h3").textContent =
-        `Welcome, ${userProfile.username}`;
-      document.getElementById("profileEmail").textContent =
-        `Email: ${userProfile.email}`;
-      document.getElementById("profileTagline").textContent =
-        getRandomTagline();
-      displayFavorites("profileFavorites", "profile-gif");
-    } else {
-      profileSection.style.display = "none";
-    }
+  const featureSection = document.getElementById("feature-section");
+  const loginStatus = document.getElementById("loginStatus");
+
+  if (userProfile) {
+    profileSection.style.display = "block";
+    featureSection.style.display = "none";
+    document.getElementById("welcomeMessage").textContent =
+      `Welcome ${userProfile.username}`;
+    document.getElementById("profileEmail").textContent =
+      `Email: ${userProfile.email}`;
+    document.getElementById("profileTagline").textContent = getRandomTagline();
+    displayFavorites("profileFavorites", "profile-gif");
+
+    loginStatus.textContent = "Logged In";
+    loginStatus.style.color = "#2ecc71";
+  } else {
+    profileSection.style.display = "none";
+    featureSection.style.display = "block";
+
+    loginStatus.textContent = "Guest";
+    loginStatus.style.color = "#e74c3c";
   }
 }
 
@@ -106,6 +116,7 @@ function displayGifs(gifs) {
 
   if (!gifs || gifs.length === 0) {
     resultContainer.classList.remove("grid");
+    resultContainer.classList.add("flex"); // NEW: switch to flex mode
 
     const message = document.createElement("div");
     message.className = "no-results";
@@ -123,7 +134,8 @@ function displayGifs(gifs) {
     return;
   }
 
-  resultContainer.classList.add("grid");
+  resultContainer.classList.remove("flex"); // remove flex if results exist
+  resultContainer.classList.add("grid"); // keep grid for GIFs
 
   gifs.forEach((gif) => {
     const imgUrl =
