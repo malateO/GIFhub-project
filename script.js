@@ -50,6 +50,7 @@ function getRandomTagline() {
 function updateUI() {
   const profileSection = document.getElementById("profile");
   const featureSection = document.getElementById("feature-section");
+  const loginStatus = document.getElementById("loginStatus");
 
   if (userProfile) {
     profileSection.style.display = "block";
@@ -60,9 +61,15 @@ function updateUI() {
       `Email: ${userProfile.email}`;
     document.getElementById("profileTagline").textContent = getRandomTagline();
     displayFavorites("profileFavorites", "profile-gif");
+
+    loginStatus.textContent = "Logged In";
+    loginStatus.style.color = "#2ecc71";
   } else {
     profileSection.style.display = "none";
     featureSection.style.display = "block";
+
+    loginStatus.textContent = "Guest";
+    loginStatus.style.color = "#e74c3c";
   }
 }
 
