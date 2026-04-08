@@ -221,26 +221,56 @@ function toggleFavorite(gif) {
 
 //login/signup
 function openAuthPopup() {
-  document.getElementById("auth-popup").style.display = "flex";
+  document.getElementById("auth-popup").style.display = "block";
 }
 
 function closeAuthPopup() {
   document.getElementById("auth-popup").style.display = "none";
 }
 
-function handleAuth(event) {
-  event.preventDefault();
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
-  login(username, password); //user your stub login
-}
+// ===== Tab Switching ======
+const loginTab = document.getElementById("loginTab");
+const signupTab = document.getElementById("signupTab");
+const loginForm = document.getElementById("loginForm");
+const signupForm = document.getElementById("signupForm");
 
-function signup() {
-  const username = document.getElementById("usernae").value;
-  const password = document.getElementById("password").value;
-  createAccount(username, password); //user your stub signup
-  closeAuthPopup();
-}
+loginTab.addEventListener("click", () => {
+  loginForm.classList.remove("hidden");
+  signupForm.classList.add("hidden");
+  loginTab.classList.add("active");
+  signupTab.classList.remove("active");
+});
+
+signupTab.addEventListener("click", () => {
+  signupForm.classList.remove("hidden");
+  loginForm.classList.add("hidden");
+  signupTab.classList.add("active");
+  loginTab.classList.remove("active");
+});
+
+// login handler
+loginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const username = document.getElementById("loginUsername").value;
+  const password = document.getElementById("loginPassword").value;
+  login(username, password); //uses stub login
+});
+
+// signup Handler
+signupForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const username = document.getElementById("signupUsername").value;
+  const email = document.getElementById("signupEmail").value;
+  const password = document.getElementById("signupPassword").value;
+  const confirmPassword = document.getElementById("signupConfirm").value;
+
+  if (password !== confirmPassword) {
+    alert("Password do not match");
+    return;
+  }
+
+  createAccount(username, password, email);
+});
 
 // 5. Event Listeners
 fetchGifs("").then((data) => displayGifs(data.data));
