@@ -48,8 +48,11 @@ body {
 }
 
 .auth-icon {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   cursor: pointer;
-  margin-left: 20px;
+  margin-left: 15px;
 }
 
 .auth-icon .material-symbol-oultined {
@@ -58,7 +61,7 @@ body {
 }
 
 .login-status {
-  margin-left: 8px;
+  margin-left: 2px;
   font-size: 14px;
   font-weight: bold;
   color: #6a0dad;
@@ -318,16 +321,25 @@ body {
   padding: 30px 40px;
   border-radius: 12px;
   width: 320px;
+  max-width: 90%;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
   text-align: center;
-  position: relative;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   font-family: "Segoe UI", sans-serif;
 }
 
 /*Subtitle*/
+
+.popup-content h2 {
+  margin-bottom: 8px;
+}
+
 .popup-content.subtitle {
   font-size: 14px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   color: #f0e6ff;
 }
 
@@ -423,6 +435,30 @@ body {
 .btn-logout:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(106, 13, 173, 0.4);
+}
+
+.modal-tabs {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+
+.modal-tabs button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: #eee;
+  cursor: pointer;
+}
+
+.modal-tabs .active {
+  background: linear-gradient(135deg, #6a0dad, #9b59b6);
+  color: #fff;
+}
+
+.auth-form.hidden {
+  display: none;
 }
 
 #profileTagline {
