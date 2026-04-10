@@ -15,6 +15,27 @@ const taglines = [
   "Legit Aura Farmer 🌾✨",
 ];
 
+const popupOverlay = document.querySelector(".popup-overlay");
+const loginTab = document.getElementById("loginTab");
+const signupTab = document.getElementById("signupTab");
+const loginForm = document.getElementById("loginForm");
+const signupForm = document.getElementById("signupForm");
+const authPopup = document.getElementById("auth-popup");
+
+//Open modal
+function openModal() {
+  authPopup.style.display = "flex";
+  const usernameInput = document.querySelector(
+    "#loginForm input[name='username']",
+  );
+  if (usernameInput) usernameInput.focus();
+}
+
+//Close Modal
+function closeModal() {
+  authPopup.style.display = "none";
+}
+
 //-------Account Stub-------//
 function createStubUser(username) {
   return {
@@ -28,7 +49,7 @@ function login(username, password) {
   //ignore password for now
   userProfile = createStubUser(username);
   updateUI();
-  closeAuthPopup();
+  closeModal();
 }
 
 function logout() {
@@ -39,7 +60,7 @@ function logout() {
 function createAccount(username, password) {
   userProfile = createStubUser(username);
   updateUI();
-  closeAuthPopup();
+  closeModal();
 }
 
 function getRandomTagline() {
@@ -220,20 +241,9 @@ function toggleFavorite(gif) {
 }
 
 //login/signup
-function openAuthPopup() {
-  document.getElementById("auth-popup").style.display = "block";
-}
 
-function closeAuthPopup() {
-  document.getElementById("auth-popup").style.display = "none";
-}
-
+// 5. Event Listeners
 // ===== Tab Switching ======
-const loginTab = document.getElementById("loginTab");
-const signupTab = document.getElementById("signupTab");
-const loginForm = document.getElementById("loginForm");
-const signupForm = document.getElementById("signupForm");
-
 loginTab.addEventListener("click", () => {
   loginForm.classList.remove("hidden");
   signupForm.classList.add("hidden");
@@ -272,9 +282,26 @@ signupForm.addEventListener("submit", (e) => {
   createAccount(username, password, email);
 });
 
-// 5. Event Listeners
 fetchGifs("").then((data) => displayGifs(data.data));
 if (userProfile) {
   displayFavorites("profileFavorites", "profile-gif");
 }
 searchBar.addEventListener("input", debounce(handleSearch, 500)); // Search with debounce
+
+window.addEventListener("keydown", (e) => {
+  console.log("key pressed", e.key);
+  if (authPopup && authPopup.style.display === "flex") {
+    if (e.key === "Escape") {
+      closeModal();
+    }
+    if (e.key === "Enter") {
+      if (!loginForm.classList.contains("hidden")) {
+        loginForm.requestSubmit();
+      } else if (!signupForm.classList.contains("hidden")) {
+        signupForm.requestSubmit();
+      }
+    }
+  }
+});
+
+document.getElementById("guestIcon").addEventListener("click", openModal);

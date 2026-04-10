@@ -25,7 +25,9 @@
         </ul>
         <!-- Right edge login/signup icon-->
         <div class="auth-icon" onclick="openAuthPopup()">
-          <span class="material-symbols-outlined">account_circle</span>
+          <span class="material-symbols-outlined" id="guestIcon"
+            >account_circle</span
+          >
           <span id="loginStatus" class="login-status">Guest</span>
         </div>
       </div>
@@ -96,7 +98,7 @@
 
     <div id="auth-popup" class="popup-overlay" style="display: none">
       <div class="popup-content satire-theme">
-        <span class="close-btn" onclick="closeAuthPopup()">&times;</span>
+        <span class="close-btn" onclick="openModal()">&times;</span>
         <h2>Welcome to GIFhub</h2>
         <p class="subtitle">Log in or sign up to save your funniest finds</p>
 
