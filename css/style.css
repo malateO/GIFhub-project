@@ -249,6 +249,17 @@ body {
   padding: 10px;
 }
 
+.gif-item img {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.gif-item img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
 /* Grid children (Gallery + Favorites + Profile) */
 .gif-item,
 .profile-gif {
@@ -278,6 +289,13 @@ body {
   }
 }
 
+.loading-text {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #fff;
+  text-align: center;
+}
+
 /* Favorite button */
 .fav-btn {
   position: absolute;
@@ -298,20 +316,55 @@ body {
 .fav-btn.active {
   background: #ffe6e6;
   color: red;
+  animation: pop 0.3s ease;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 /*popup overlay */
 .popup-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background: rgba(40, 0, 60, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.popup-overlay.show .popup-content {
+  transform: scale(1);
+}
+
+.popup-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.popup-content {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 400px;
+  width: 90%;
+  transform: scale(0.95);
+  transition: transform 0.35s ease;
 }
 
 /*popup box */
@@ -324,10 +377,6 @@ body {
   max-width: 90%;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
   text-align: center;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   font-family: "Segoe UI", sans-serif;
 }
 
@@ -465,4 +514,14 @@ body {
   font-style: italic;
   color: #9b59b6;
   margin-bottom: 10px;
+}
+
+@media (max-width: 600px) {
+  .popup-content {
+    width: 90%;
+    padding: 20px;
+  }
+  #gifResults {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
 }

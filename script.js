@@ -24,7 +24,7 @@ const authPopup = document.getElementById("auth-popup");
 
 //Open modal
 function openModal() {
-  authPopup.style.display = "flex";
+  authPopup.classList.add("show");
   const usernameInput = document.querySelector(
     "#loginForm input[name='username']",
   );
@@ -33,7 +33,7 @@ function openModal() {
 
 //Close Modal
 function closeModal() {
-  authPopup.style.display = "none";
+  authPopup.classList.remove("show");
 }
 
 //-------Account Stub-------//
@@ -290,7 +290,7 @@ searchBar.addEventListener("input", debounce(handleSearch, 500)); // Search with
 
 window.addEventListener("keydown", (e) => {
   console.log("key pressed", e.key);
-  if (authPopup && authPopup.style.display === "flex") {
+  if (authPopup.classList.contains("show")) {
     if (e.key === "Escape") {
       closeModal();
     }
