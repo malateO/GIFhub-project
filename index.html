@@ -24,7 +24,7 @@
           <li class="navlist"><a href="#">About</a></li>
         </ul>
         <!-- Right edge login/signup icon-->
-        <div class="auth-icon" onclick="openAuthPopup()">
+        <div class="auth-icon" onclick="openModal()">
           <span class="material-symbols-outlined" id="guestIcon"
             >account_circle</span
           >
@@ -61,11 +61,9 @@
         <section id="feature-section">
           <h2 class="feature-header">Feature Gifs</h2>
           <div class="gif-gallery" id="gifGallery">
-            <div
-              id="loadingSpinner"
-              class="spinner"
-              style="display: none"
-            ></div>
+            <div id="loadingSpinner" class="spinner" style="display: none">
+              <p class="loading-text">Mythical Pull Loading......</p>
+            </div>
             <div id="gifResults"></div>
           </div>
         </section>
@@ -96,7 +94,7 @@
       <div id="profileFavorites" class="grid"></div>
     </section>
 
-    <div id="auth-popup" class="popup-overlay" style="display: none">
+    <div id="auth-popup" class="popup-overlay">
       <div class="popup-content satire-theme">
         <span class="close-btn" onclick="openModal()">&times;</span>
         <h2>Welcome to GIFhub</h2>
