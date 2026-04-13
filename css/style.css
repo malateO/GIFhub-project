@@ -344,7 +344,10 @@ body {
   background: rgba(40, 0, 60, 0.7);
   z-index: 999;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  visibility: hidden;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
   pointer-events: none;
 }
 
@@ -354,7 +357,9 @@ body {
 
 .popup-overlay.show {
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
+  transform: scale(1);
 }
 
 .popup-content {
