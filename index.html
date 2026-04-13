@@ -94,11 +94,20 @@
       <div id="profileFavorites" class="grid"></div>
     </section>
 
-    <div id="auth-popup" class="popup-overlay">
+    <div
+      id="auth-popup"
+      class="popup-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle"
+      aria-describedby="modalSubtitle"
+    >
       <div class="popup-content satire-theme">
-        <span class="close-btn" onclick="openModal()">&times;</span>
-        <h2>Welcome to GIFhub</h2>
-        <p class="subtitle">Log in or sign up to save your funniest finds</p>
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 id="modalTitle">Welcome to GIFhub</h2>
+        <p class="subtitle" id="modalSubtitle">
+          Log in or sign up to save your funniest finds
+        </p>
 
         <!-- Tabs -->
         <div class="modal-tabs">
@@ -111,12 +120,15 @@
           <input
             type="text"
             id="loginUsername"
+            name="username"
+            aria-label="Username"
             placeholder="Username"
             required
           />
           <input
             type="password"
             id="loginPassword"
+            aria-label="Password"
             placeholder="Password"
             required
           />
@@ -128,19 +140,30 @@
           <input
             type="text"
             id="signupUsername"
-            placeholder="Userame"
+            name="username"
+            aria-label="Username"
+            placeholder="Username"
             required
           />
-          <input type="email" id="signupEmail" placeholder="Email" required />
+          <input
+            type="email"
+            id="signupEmail"
+            name="email"
+            aria-label="Email"
+            placeholder="Email"
+            required
+          />
           <input
             type="password"
-            id="loginPassword"
+            id="signupPassword"
+            aria-label="Password"
             placeholder="Password"
             required
           />
           <input
             type="password"
             id="signupConfirm"
+            aria-label="Confirm Password"
             placeholder="Confirm Password"
             required
           />

@@ -24,16 +24,28 @@ const authPopup = document.getElementById("auth-popup");
 
 //Open modal
 function openModal() {
+  authPopup.style.visibility = "visible";
   authPopup.classList.add("show");
-  const usernameInput = document.querySelector(
-    "#loginForm input[name='username']",
+
+  authPopup.addEventListener(
+    "transitionend",
+    () => {
+      const usernameInput = document.querySelector(
+        "#loginForm input[name='username']",
+      );
+      if (usernameInput) usernameInput.focus();
+    },
+    { once: true },
   );
-  if (usernameInput) usernameInput.focus();
 }
 
 //Close Modal
 function closeModal() {
   authPopup.classList.remove("show");
+
+  setTimeout(() => {
+    authPopup.style.visibility = "hidden";
+  });
 }
 
 //-------Account Stub-------//
@@ -291,9 +303,11 @@ searchBar.addEventListener("input", debounce(handleSearch, 500)); // Search with
 window.addEventListener("keydown", (e) => {
   console.log("key pressed", e.key);
   if (authPopup.classList.contains("show")) {
+    // Escapes closes modal
     if (e.key === "Escape") {
       closeModal();
     }
+    // Enters submits active form
     if (e.key === "Enter") {
       if (!loginForm.classList.contains("hidden")) {
         loginForm.requestSubmit();
@@ -301,6 +315,26 @@ window.addEventListener("keydown", (e) => {
         signupForm.requestSubmit();
       }
     }
+    // Tab Focus Trap
+    if (e.key === "Tab") {
+      const focusable = authPopup.querySelectorAll("input, button, .close-btn");
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }
+});
+
+authPopup.addEventListener("click", (e) => {
+  if (e.target === authPopup) {
+    closeModal();
   }
 });
 
