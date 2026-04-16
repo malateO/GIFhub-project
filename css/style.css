@@ -189,6 +189,27 @@ body {
   padding: 10px;
 }
 
+.btn-load-more {
+  display: block;
+  margin: 20px auto;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #a64dff, #9b59b6);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.3s ease;
+}
+
+.btn-load-more:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(106, 13, 173, 0.4);
+}
+
 #feature-section,
 #profile {
   background: linear-gradient(135deg, #f9f0ff, #e6ccff, #d1a3ff);

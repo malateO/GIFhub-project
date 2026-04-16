@@ -2,6 +2,13 @@ function displayGifs(gifs) {
   lastDisplayedGifs = gifs;
   const resultContainer = document.getElementById("gifResults");
   resultContainer.innerHTML = "";
+  const loadMoreBtn = document.getElementById("loadMoreBtn");
+
+  if (!gifs || gifs.length === 0) {
+    if (loadMoreBtn) loadMoreBtn.style.display = "none";
+  } else {
+    if (loadMoreBtn) loadMoreBtn.style.display = "block";
+  }
 
   if (!gifs || gifs.length === 0) {
     resultContainer.classList.remove("grid");

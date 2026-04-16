@@ -1,7 +1,10 @@
 let lastDisplayedGifs = [];
+let infiniteScrollEnabled = false;
 
 const gifGallery = document.getElementById("gifGallery");
 const searchBar = document.getElementById("searchBar");
+
+const loadMoreBtn = document.getElementById("loadMoreBtn");
 
 const popupOverlay = document.querySelector(".popup-overlay");
 const loginTab = document.getElementById("loginTab");
@@ -58,17 +61,36 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
-window.addEventListener("scroll", async () => {
-  if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
-    const query = searchBar.value.trim();
-    const data = await fetchGifs(query);
-    displayGifs([...lastDisplayedGifs, ...data.data]);
-  }
-});
+// window.addEventListener("scroll", async () => {
+//   if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
+//     const query = searchBar.value.trim();
+//     const data = await fetchGifs(query);
+//     displayGifs([...lastDisplayedGifs, ...data.data]);
+//   }
+// });
 
 authPopup.addEventListener("click", (e) => {
   if (e.target === authPopup) {
     closeModal();
+  }
+});
+
+loadMoreBtn.addEventListener("click", async () => {
+  const query = searchBar.value.trim();
+  const data = await fetchGifs(query);
+  displayGifs([...lastDisplayedGifs, ...data.data]);
+
+  if (!infiniteScrollEnabled) {
+    window.addEventListener("scroll", async () => {
+      if (
+        window.innerHeight + window.scrollY >=
+        document.body.offsetHeight - 200
+      ) {
+        const query = searchBar.value.trim();
+        const data = await fetchGifs(query);
+        displayGifs([...lastDisplayedGifs, ...data.data]);
+      }
+    });
   }
 });
 
