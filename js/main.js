@@ -74,14 +74,6 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
-// window.addEventListener("scroll", async () => {
-//   if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
-//     const query = searchBar.value.trim();
-//     const data = await fetchGifs(query);
-//     displayGifs([...lastDisplayedGifs, ...data.data]);
-//   }
-// });
-
 authPopup.addEventListener("click", (e) => {
   if (e.target === authPopup) {
     closeModal();
