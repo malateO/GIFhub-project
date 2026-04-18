@@ -1,31 +1,21 @@
 function displayGifs(gifs) {
   lastDisplayedGifs = gifs;
-  const resultContainer = document.getElementById("gifResults");
+
+  const resultContainer = userProfile
+    ? document.getElementById("profileSearchResults")
+    : document.getElementById("gifResults");
+
   resultContainer.innerHTML = "";
   const loadMoreBtn = document.getElementById("loadMoreBtn");
 
   if (!gifs || gifs.length === 0) {
     if (loadMoreBtn) loadMoreBtn.style.display = "none";
-  } else {
-    if (loadMoreBtn) loadMoreBtn.style.display = "block";
-  }
-
-  if (!gifs || gifs.length === 0) {
     resultContainer.classList.remove("grid");
-    resultContainer.classList.add("flex"); // NEW: switch to flex mode
+    resultContainer.classList.add("flex");
 
     const message = document.createElement("div");
     message.className = "no-results";
-
-    const icon = document.createElement("span");
-    icon.className = "material-symbols-outlined";
-    icon.textContent = "search";
-
-    const text = document.createElement("span");
-    text.textContent = "No GIF's found. Try another search!";
-
-    message.appendChild(icon);
-    message.appendChild(text);
+    message.textContent = "No GIFs Found. Try Another Search!";
     resultContainer.appendChild(message);
     return;
   }
@@ -46,6 +36,7 @@ function displayGifs(gifs) {
       const img = document.createElement("img");
       img.src = imgUrl;
       img.alt = gif.title || "GIF";
+
       if (userProfile) {
         const favButton = document.createElement("button");
         favButton.className = "fav-btn";
