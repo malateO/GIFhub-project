@@ -3,6 +3,8 @@ let infiniteScrollEnabled = false;
 
 const gifGallery = document.getElementById("gifGallery");
 const searchBar = document.getElementById("searchBar");
+const searchForm = document.querySelector(".search-form");
+const spinner = document.getElementById("loadingSpinner");
 
 const loadMoreBtn = document.getElementById("loadMoreBtn");
 
@@ -12,6 +14,17 @@ const signupTab = document.getElementById("signupTab");
 const loginForm = document.getElementById("loginForm");
 const signupForm = document.getElementById("signupForm");
 const authPopup = document.getElementById("auth-popup");
+
+async function loadMoreGifs(query) {
+  try {
+    const data = await fetchGifs(query);
+    displayGifs([...lastDisplayedGifs, ...data.data]);
+  } catch (error) {
+    showError("Oops! something went wrong!");
+  } finally {
+    spinner.style.display = "none";
+  }
+}
 
 fetchGifs("").then((data) => displayGifs(data.data));
 if (userProfile) {
@@ -77,20 +90,30 @@ authPopup.addEventListener("click", (e) => {
 
 loadMoreBtn.addEventListener("click", async () => {
   const query = searchBar.value.trim();
-  const data = await fetchGifs(query);
-  displayGifs([...lastDisplayedGifs, ...data.data]);
+  await loadMoreGifs(query);
+  loadMoreBtn.style.display = "none";
 
   if (!infiniteScrollEnabled) {
+    infiniteScrollEnabled = true;
     window.addEventListener("scroll", async () => {
       if (
         window.innerHeight + window.scrollY >=
         document.body.offsetHeight - 200
       ) {
         const query = searchBar.value.trim();
-        const data = await fetchGifs(query);
+        await loadMoreGifs(query);
         displayGifs([...lastDisplayedGifs, ...data.data]);
       }
     });
+  }
+});
+
+searchForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const query = searchBar.value.trim();
+  if (query) {
+    const data = await fetchGifs(query);
+    displayGifs(data.data);
   }
 });
 
