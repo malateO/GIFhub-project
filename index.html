@@ -130,6 +130,7 @@
             name="username"
             aria-label="Username"
             placeholder="Username"
+            autocomplete="off"
             required
           />
           <input
@@ -137,8 +138,11 @@
             id="loginPassword"
             aria-label="Password"
             placeholder="Password"
+            autocomplete="off"
             required
           />
+
+          <label> <input type="checkbox" id="rememberMe" /> Remember Me </label>
           <button type="submit" class="btn-login">Login</button>
         </form>
 

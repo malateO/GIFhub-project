@@ -1,4 +1,10 @@
-let userProfile = null; //starts logged out
+let userProfile = null;
+
+const savedProfile = localStorage.getItem("userProfile");
+if (savedProfile) {
+  userProfile = JSON.parse(savedProfile);
+  updateUI();
+}
 
 const taglines = [
   "Certified Meme Lord 🏆",
@@ -22,11 +28,13 @@ function login(username, password) {
   //ignore password for now
   userProfile = createStubUser(username);
   updateUI();
+  localStorage.setItem("userProfile", JSON.stringify(userProfile));
   closeModal();
 }
 
 function logout() {
   userProfile = null;
+  localStorage.removeItem("userProfile");
   updateUI();
 }
 
@@ -48,7 +56,7 @@ function updateUI() {
 
   if (userProfile) {
     profileSection.style.display = "block";
-    featureSection.style.display = "none";
+    featureSection.style.display = "block";
     document.getElementById("welcomeMessage").textContent =
       `Welcome ${userProfile.username}`;
     document.getElementById("profileEmail").textContent =
@@ -114,7 +122,19 @@ loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const username = document.getElementById("loginUsername").value;
   const password = document.getElementById("loginPassword").value;
-  login(username, password); //uses stub login
+  login(username, password);
+  document.getElementById("loginUsername").value = "";
+  document.getElementById("loginPassword").value = "";
+  //uses stub login
+
+  if (document.getElementById("rememberMe").checked) {
+    localStorage.setItem("savedAccount", username);
+  }
+
+  const savedAccount = localStorage.getItem("saveAccount");
+  if (savedAccount) {
+    document.getElementById("loginUsername").value = savedAccount;
+  }
 });
 
 // signup Handler

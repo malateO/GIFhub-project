@@ -135,27 +135,6 @@ body {
   padding: 10px;
 }
 
-/* Actual grid for Feature Gifs */
-/* CHANGE: grid applied only to #gifResults, so GIFs align properly */
-#gifResults {
-  display: grid; /* use grid consistently */
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
-  padding: 10px;
-  justify-items: center; /* center items inside each grid cell */
-  align-items: start; /* align items to the top of each cell */
-  width: 100%;
-  box-sizing: border-box; /* prevent overflow */
-}
-
-#gifResults.flex {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 250px;
-  width: 100%;
-}
-
 .no-results {
   display: flex;
   flex-direction: column;
@@ -182,11 +161,11 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-#gifResults.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
-  padding: 10px;
+.gif-item img,
+.profile-gif img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 .btn-load-more {
@@ -235,6 +214,18 @@ body {
   margin-bottom: 10px;
 }
 
+#gifResults,
+#profileSearchResults,
+#favorites,
+#profileFavorites {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  padding: 10px;
+  grid-auto-flow: dense;
+  align-items: start;
+}
+
 .no-results {
   display: flex;
   flex-direction: column;
@@ -254,22 +245,6 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Grid for Favorites section */
-#favorites {
-  display: grid; /* consistent grid for favorites */
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
-  padding: 10px;
-}
-
-/* Grid for Profile section */
-#profileFavorites {
-  display: grid; /* consistent grid for profile */
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
-  padding: 10px;
-}
-
 .gif-item img {
   transition:
     transform 0.2s ease,
@@ -284,6 +259,11 @@ body {
 /* Grid children (Gallery + Favorites + Profile) */
 .gif-item,
 .profile-gif {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f9f0ff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   position: relative; /* needed for heart button positioning */
 }
 
@@ -328,13 +308,19 @@ body {
   cursor: pointer;
   font-size: 18px;
   padding: 5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+  z-index: 10;
 }
 
 .fav-btn:hover {
   background: #ffcccc;
+  color: red;
 }
 
-.fav-btn.active {
+.fav-btn.active:hover {
   background: #ffe6e6;
   color: red;
   animation: pop 0.3s ease;
@@ -551,13 +537,4 @@ body {
   #gifResults {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
-}
-
-#profileSearchResults {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
-  padding: 10px;
-  justify-items: center;
-  align-items: start;
 }
