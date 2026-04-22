@@ -52,7 +52,9 @@
               class="search-box"
               id="searchBar"
               placeholder="Search"
+              autocomplete="off"
             />
+            <div class="search-suggestions" id="searchSuggestions"></div>
           </div>
         </form>
       </section>
@@ -76,10 +78,6 @@
           <h3 id="welcomeMessage">Welcome, Guess</h3>
           <p id="profileTagline"></p>
           <p id="profileEmail"></p>
-          <div>
-            <h3>Search Results</h3>
-            <div id="profileSearchResults" class="grid"></div>
-          </div>
 
           <button onclick="logout()" class="btn-logout">Logout</button>
 

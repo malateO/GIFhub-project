@@ -26,6 +26,7 @@ function createStubUser(username) {
 
 function login(username, password) {
   //ignore password for now
+  if (userProfile) return;
   userProfile = createStubUser(username);
   updateUI();
   localStorage.setItem("userProfile", JSON.stringify(userProfile));
@@ -131,7 +132,7 @@ loginForm.addEventListener("submit", (e) => {
     localStorage.setItem("savedAccount", username);
   }
 
-  const savedAccount = localStorage.getItem("saveAccount");
+  const savedAccount = localStorage.getItem("savedAccount");
   if (savedAccount) {
     document.getElementById("loginUsername").value = savedAccount;
   }
