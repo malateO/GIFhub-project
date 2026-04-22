@@ -1,9 +1,14 @@
-function displayGifs(gifs) {
+function displayGifs(gifs, isSearch = false, query = "") {
   lastDisplayedGifs = gifs;
+  const featureHeader = document.querySelector(".feature-header");
 
-  const resultContainer = userProfile
-    ? document.getElementById("profileSearchResults")
-    : document.getElementById("gifResults");
+  if (query) {
+    featureHeader.textContent = `Search Results for ${query}`;
+  } else {
+    featureHeader.textContent = "Feature GIFs";
+  }
+
+  const resultContainer = document.getElementById("gifResults");
 
   resultContainer.innerHTML = "";
   const loadMoreBtn = document.getElementById("loadMoreBtn");

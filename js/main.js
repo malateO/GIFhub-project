@@ -30,14 +30,28 @@ fetchGifs("").then((data) => displayGifs(data.data));
 if (userProfile) {
   displayFavorites("profileFavorites", "profile-gif");
 }
+
 searchBar.addEventListener(
   "input",
   debounce(async (event) => {
-    const gifs = await handleSearch(event);
-    if (gifs) {
-      displayGifs(gifs);
-    } else {
-      showError("Oops! Something went wrong fetching GIFS");
+    const query = event.target.value.trim();
+    const suggestionsContainer = document.getElementById("searchSuggestions");
+    suggestionsContainer.innerHTML = "";
+
+    if (query) {
+      const suggestions = await fetchSuggestions(query);
+      suggestions.forEach((s) => {
+        const suggestionItem = document.createElement("div");
+        suggestionItem.className = "suggestion-item";
+        suggestionItem.textContent = s;
+
+        suggestionItem.addEventListener("click", async () => {
+          searchBar.value = s;
+          searchForm.requestSubmit();
+          suggestionsContainer.innerHTML = "";
+        });
+        suggestionsContainer.appendChild(suggestionItem);
+      });
     }
   }, 500),
 );
@@ -103,9 +117,13 @@ loadMoreBtn.addEventListener("click", async () => {
 searchForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const query = searchBar.value.trim();
+
   if (query) {
     const data = await fetchGifs(query);
-    displayGifs(data.data);
+    displayGifs(data.data, true, query);
+  } else {
+    const data = await fetchGifs("");
+    displayGifs(data.data, false);
   }
 });
 

@@ -26,6 +26,13 @@ async function handleSearch(event) {
   }
 }
 
+async function fetchSuggestions(query) {
+  const endpoint = `https://api.giphy.com/v1/tags/related/${encodeURIComponent(query)}?api_key=${API_KEY}`;
+  const response = await fetch(endpoint);
+  const data = await response.json();
+  return data.data.map((item) => item.name);
+}
+
 function debounce(func, delay) {
   let timeout;
   return function (...args) {

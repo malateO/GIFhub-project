@@ -18,6 +18,7 @@ function toggleFavorite(gif) {
 
   // Refresh all views to stay in sync
   displayGifs(lastDisplayedGifs);
+  displayFavorites("profileFavorites", "profile-gif");
 }
 
 function displayFavorites(containerId, wrapperClass) {
