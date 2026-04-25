@@ -180,6 +180,38 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+#gifGallery {
+  height: 600px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+  background: #1a0b1f;
+}
+
+#gifGaller::-webkit-scrollbar {
+  width: 8px;
+}
+
+#gifGallery::-webkit-scrollbar-track {
+  background: #1a0b1f;
+}
+
+#gifGallery::-webkit-scrollbar-thumb {
+  background-color: #6a0dad;
+  border-radius: 4px;
+  border: 2px solid #1a0b1f;
+}
+
+#gifGaller::-webkit-slider-thumb:hover {
+  background-color: #8e24aa;
+}
+
+#gifGallery {
+  scrollbar-width: thin;
+  scrollbar-color: #6a0dad #1a0b1f;
+}
+
 .gif-item,
 .profile-gif {
   width: 100%;
@@ -546,6 +578,26 @@ body {
 .modal-tabs .active {
   background: linear-gradient(135deg, #6a0dad, #9b59b6);
   color: #fff;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #d1c4e9;
+  cursor: pointer;
+}
+
+.remember-me input[type="checkbox"] {
+  accent-color: #6a0dad;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.remember-me span {
+  user-select: none;
 }
 
 .auth-form.hidden {
