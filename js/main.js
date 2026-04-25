@@ -101,14 +101,13 @@ loadMoreBtn.addEventListener("click", async () => {
 
   if (!infiniteScrollEnabled) {
     infiniteScrollEnabled = true;
-    window.addEventListener("scroll", async () => {
+    gifGallery.addEventListener("scroll", async () => {
       if (
-        window.innerHeight + window.scrollY >=
-        document.body.offsetHeight - 200
+        gifGallery.scrollTop + gifGallery.clientHeight >=
+        gifGallery.scrollHeight - 200
       ) {
         const query = searchBar.value.trim();
         await loadMoreGifs(query);
-        displayGifs([...lastDisplayedGifs, ...data.data]);
       }
     });
   }

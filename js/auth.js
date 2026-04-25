@@ -24,12 +24,19 @@ function createStubUser(username) {
   };
 }
 
-function login(username, password) {
+async function login(username, password) {
   //ignore password for now
   if (userProfile) return;
+
   userProfile = createStubUser(username);
   updateUI();
+
+  const query = searchBar.value.trim();
+  const data = await fetchGifs(query || "");
+  displayGifs(data.data, true, query);
+
   localStorage.setItem("userProfile", JSON.stringify(userProfile));
+
   closeModal();
 }
 
@@ -37,6 +44,12 @@ function logout() {
   userProfile = null;
   localStorage.removeItem("userProfile");
   updateUI();
+
+  const query = searchBar.value.trim();
+  fetchGifs(query || "").then((data) => {
+    displayGifs(data.data, true, query);
+  });
+  closeModal();
 }
 
 function createAccount(username, password) {
