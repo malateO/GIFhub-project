@@ -21,7 +21,7 @@ function toggleFavorite(gif) {
   displayFavorites("profileFavorites", "profile-gif");
 }
 
-function displayFavorites(containerId, wrapperClass) {
+function displayFavorites(containerId) {
   if (!userProfile) return;
 
   const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
@@ -29,16 +29,19 @@ function displayFavorites(containerId, wrapperClass) {
   container.innerHTML = "";
 
   if (favorites.length === 0) {
-    container.textContent = "No favorites yet";
+    const message = document.createElement("div");
+    message.className = "no-results";
+    message.textContent = "No Favorites Yet!";
+    container.appendChild(message);
     return;
   }
 
   favorites.forEach((gif) => {
     const gifWrapper = document.createElement("div");
-    gifWrapper.className = wrapperClass;
+    gifWrapper.className = "gif-item";
 
     const img = document.createElement("img");
-    img.src = gif.images.fixed_height.url;
+    img.src = gif.images.fixed_height.url || gif.images?.downsized?.url;
     img.alt = gif.title || "Favorite GIF";
 
     const favButton = document.createElement("button");
@@ -46,7 +49,10 @@ function displayFavorites(containerId, wrapperClass) {
     favButton.textContent = "❤️";
 
     // Allow removing directly from Favorites
-    favButton.addEventListener("click", () => toggleFavorite(gif));
+    favButton.addEventListener("click", () => {
+      toggleFavorite(gif);
+      displayFavorites(containerId);
+    });
 
     gifWrapper.appendChild(img);
     gifWrapper.appendChild(favButton);

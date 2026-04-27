@@ -125,5 +125,3 @@ searchForm.addEventListener("submit", async (e) => {
     displayGifs(data.data, false);
   }
 });
-
-document.getElementById("guestIcon").addEventListener("click", openModal);
