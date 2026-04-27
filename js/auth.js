@@ -1,5 +1,8 @@
 let userProfile = null;
 
+const authIcon = document.getElementById("authIcon");
+const profileDropdown = document.getElementById("profileDropdown");
+
 const savedProfile = localStorage.getItem("userProfile");
 if (savedProfile) {
   userProfile = JSON.parse(savedProfile);
@@ -64,31 +67,51 @@ function getRandomTagline() {
 }
 
 function updateUI() {
-  const profileSection = document.getElementById("profile");
   const featureSection = document.getElementById("feature-section");
+  const profileSection = document.getElementById("profile");
   const loginStatus = document.getElementById("loginStatus");
 
   if (userProfile) {
+    featureSection.style.display = "none";
     profileSection.style.display = "block";
-    featureSection.style.display = "block";
-    document.getElementById("welcomeMessage").textContent =
-      `Welcome ${userProfile.username}`;
-    document.getElementById("profileEmail").textContent =
-      `Email: ${userProfile.email}`;
-    document.getElementById("profileTagline").textContent = getRandomTagline();
+    displayFavorites("profileFavorites");
 
-    displayFavorites("profileFavorites", "profile-gif");
+    loginStatus.textContent = userProfile.username;
+    loginStatus.classList.add("logged-in");
+    authIcon.classList.add("logged-in");
 
-    loginStatus.textContent = "Logged In";
-    loginStatus.style.color = "#2ecc71";
+    authIcon.onclick = null;
   } else {
     profileSection.style.display = "none";
     featureSection.style.display = "block";
 
     loginStatus.textContent = "Guest";
-    loginStatus.style.color = "#e74c3c";
+    loginStatus.classList.remove("logged-in");
+    authIcon.classList.remove("logged-in");
+
+    authIcon.onclick = openModal;
   }
 }
+
+function enableMobileDropdown() {
+  //only enable click toggle if device does NOT support hover
+  if (window.matchMedia("(hover: none)").matches) {
+    authIcon.addEventListener("click", () => {
+      if (userProfile) {
+        // logged in → toggle dropdown
+        profileDropdown.style.display =
+          profileDropdown.style.display === "block" ? "none" : "block";
+        //toggle chevron rotation with class
+        authIcon.classList.toggle("open");
+      } else {
+        // Still open login modal when logged out
+        openModal();
+      }
+    });
+  }
+}
+
+enableMobileDropdown();
 
 //Open modal
 function openModal() {
