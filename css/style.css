@@ -721,6 +721,61 @@ body {
   gap: 15px;
 }
 
+/* Profile Header */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* Avatar */
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid #6a0dad;
+  background: #fff;
+  object-fit: cover;
+}
+
+/* Username + Handle */
+.profile-info h2 {
+  margin: 0;
+  font-size: 1.8em;
+  font-weight: 700;
+  color: #000; /* GIPHY uses strong black for username */
+}
+
+.profile-info p#profileHandle {
+  margin: 2px 0;
+  font-size: 1em;
+  color: #666; /* lighter gray for handle */
+  font-weight: 500;
+}
+
+/* Tagline + Email */
+#profileTagline {
+  font-style: italic;
+  color: #9b59b6;
+  margin-top: 6px;
+}
+
+#profileEmail {
+  font-size: 0.9em;
+  color: #888;
+}
+
+/* Profile Dashboard Subheader */
+.profile-subheader {
+  font-size: 1.2em;
+  font-weight: 600;
+  margin: 20px 0 10px;
+  color: #333;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 6px;
+}
+
 @media (max-width: 600px) {
   .popup-content {
     width: 90%;

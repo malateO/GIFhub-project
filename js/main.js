@@ -119,7 +119,16 @@ searchForm.addEventListener("submit", async (e) => {
 
   if (query) {
     const data = await fetchGifs(query);
-    displayGifs(data.data, true, query);
+
+    if (userProfile) {
+      // logge in > show results in profile
+      document.getElementById("profile").style.display = "none";
+      document.getElementById("profileSearchResults").style.display = "block";
+      displayProfileSearchResults(data.data, query);
+    } else {
+      // logged out > show results in homepage
+      displayGifs(data.data, true, query);
+    }
   } else {
     const data = await fetchGifs("");
     displayGifs(data.data, false);
