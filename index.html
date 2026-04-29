@@ -94,16 +94,20 @@
             class="profile-avatar"
           />
           <div class="profile-info">
-            <h2 id="welcomeMessage">Welcome, Guest</h2>
+            <!-- Username (set dynamically when logged in) -->
+            <h2 id="welcomeMessage"></h2>
+            <!-- Handle (set dynamically when logged in) -->
+            <p id="profileHandle"></p>
+            <!-- Optional tagline or email -->
             <p id="profileTagline"></p>
             <p id="profileEmail"></p>
           </div>
         </header>
 
-        <button onclick="logout()" class="btn-logout">Logout</button>
+        <h3 class="profile-subheader">Profile Dashboard</h3>
+        <p>Manage your account and explore GIFs.</p>
 
-        <h3 class="profile-subheader">Your Favorites</h3>
-        <div id="profileFavorites" class="grid"></div>
+        <div id="profileSearchResults" style="display: none"></div>
       </section>
     </main>
 

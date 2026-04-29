@@ -72,16 +72,24 @@ function updateUI() {
   const loginStatus = document.getElementById("loginStatus");
 
   if (userProfile) {
+    // logged in → show profile dashboard
     featureSection.style.display = "none";
     profileSection.style.display = "block";
-    displayFavorites("profileFavorites");
 
     loginStatus.textContent = userProfile.username;
     loginStatus.classList.add("logged-in");
     authIcon.classList.add("logged-in");
 
-    authIcon.onclick = null;
+    // Set username + handle dynamically
+    document.getElementById("welcomeMessage").textContent =
+      userProfile.username;
+    document.getElementById("profileHandle").textContent =
+      "@" + userProfile.username;
+
+    // reset dropdown state by removing "open"
+    authIcon.classList.remove("open");
   } else {
+    // logged out → hide profile completely
     profileSection.style.display = "none";
     featureSection.style.display = "block";
 
@@ -89,25 +97,40 @@ function updateUI() {
     loginStatus.classList.remove("logged-in");
     authIcon.classList.remove("logged-in");
 
-    authIcon.onclick = openModal;
+    // Clear profile header
+    document.getElementById("welcomeMessage").textContent = "";
+    document.getElementById("profileHandle").textContent = "";
+
+    // ensure dropdown is closed
+    authIcon.classList.remove("open");
+  }
+
+  enableMobileDropdown();
+}
+
+function mobileAuthClickHandler() {
+  if (userProfile) {
+    // Logged in → toggle dropdown class only
+    authIcon.classList.toggle("open");
+  } else {
+    // Logged out → open modal
+    openModal();
   }
 }
 
 function enableMobileDropdown() {
-  //only enable click toggle if device does NOT support hover
+  // Clean up first
+  authIcon.removeEventListener("click", mobileAuthClickHandler);
+
+  // Always allow click when logged out (to open modal)
+  if (!userProfile) {
+    authIcon.addEventListener("click", mobileAuthClickHandler);
+    return;
+  }
+
+  // Only attach click handler for logged-in users on mobile
   if (window.matchMedia("(hover: none)").matches) {
-    authIcon.addEventListener("click", () => {
-      if (userProfile) {
-        // logged in → toggle dropdown
-        profileDropdown.style.display =
-          profileDropdown.style.display === "block" ? "none" : "block";
-        //toggle chevron rotation with class
-        authIcon.classList.toggle("open");
-      } else {
-        // Still open login modal when logged out
-        openModal();
-      }
-    });
+    authIcon.addEventListener("click", mobileAuthClickHandler);
   }
 }
 
