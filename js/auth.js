@@ -73,6 +73,13 @@ function updateUI() {
 
   if (userProfile) {
     // logged in → show profile dashboard
+    // reset profile search state and hide profile gallery content
+    profileSearchState = { query: "", offset: 0, limit: 20 };
+    const profileGrid = document.getElementById("profileGifResults");
+    if (profileGrid) profileGrid.innerHTML = "";
+    const profileLoadMore = document.getElementById("profileLoadMoreBtn");
+    if (profileLoadMore) profileLoadMore.style.display = "none";
+
     featureSection.style.display = "none";
     profileSection.style.display = "block";
 
@@ -90,6 +97,11 @@ function updateUI() {
     authIcon.classList.remove("open");
   } else {
     // logged out → hide profile completely
+    // in logout()
+    profileSearchState = { query: "", offset: 0, limit: 20 };
+    const profileGrid = document.getElementById("profileGifResults");
+    if (profileGrid) profileGrid.innerHTML = "";
+
     profileSection.style.display = "none";
     featureSection.style.display = "block";
 

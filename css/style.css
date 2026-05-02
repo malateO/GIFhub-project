@@ -286,7 +286,7 @@ body {
   background: #1a0b1f;
 }
 
-#gifGaller::-webkit-scrollbar {
+#gifGallery::-webkit-scrollbar {
   width: 8px;
 }
 
@@ -366,8 +366,45 @@ body {
   color: #4a004a;
 }
 
+/* Profile gallery wrapper mirrors homepage feature gallery */
+#profileGifGallery {
+  height: 600px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+  background: #1a0b1f; /* same purple background */
+}
+
+/* Grid container for profile results (same layout as #gifResults) */
+#profileGifResults {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  padding: 10px;
+  grid-auto-flow: dense;
+  align-items: start;
+}
+
+/* Keep scrollbar styling consistent */
+#profileGifGallery::-webkit-scrollbar {
+  width: 8px;
+}
+#profileGifGallery::-webkit-scrollbar-track {
+  background: #1a0b1f;
+}
+#profileGifGallery::-webkit-scrollbar-thumb {
+  background-color: #6a0dad;
+  border-radius: 4px;
+  border: 2px solid #1a0b1f;
+}
+#profileGifGallery {
+  scrollbar-width: thin;
+  scrollbar-color: #6a0dad #1a0b1f;
+}
+
 #gifResults,
-#profileSearchResults,
+#profileSearchResults.active,
 #favorites,
 #profileFavorites {
   display: grid;
@@ -376,6 +413,34 @@ body {
   padding: 10px;
   grid-auto-flow: dense;
   align-items: start;
+}
+
+#gifResults,
+#profileGifResults {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+  gap: 15px;
+  padding: 10px;
+  align-items: start;
+}
+
+/* profile grid uses same layout as gifResults */
+#gifResults,
+#profileGifGrid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  padding: 10px;
+  grid-auto-flow: dense;
+  align-items: start;
+}
+
+.gif-item {
+  width: 100%;
+  max-width: none; /* let the grid control sizing */
+  border-radius: 12px;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .gif-item img {
@@ -774,6 +839,92 @@ body {
   color: #333;
   border-bottom: 1px solid #ddd;
   padding-bottom: 6px;
+}
+
+#profileSearchResults {
+  display: none;
+}
+
+#gifResults,
+#profileSearchResults.active {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  padding: 10px;
+  grid-auto-flow: dense;
+  align-items: start;
+}
+
+#gifResults h2,
+#profileSearchResults h2 {
+  grid-column: 1 / -1;
+  text-align: center;
+  margin-bottom: 15px;
+  color: #6a0dad;
+  font-weight: 600;
+}
+
+/* Ensure profile gallery and inner grid use full available width */
+#profile,
+#profileSearchResults,
+#profileGifGallery {
+  width: 100% !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+
+/* Make inner grid responsive like homepage */
+#profileGifResults {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+  gap: 15px !important;
+  width: 100% !important;
+  align-items: start !important;
+}
+
+/* Keep cards compact so multiple columns can fit */
+#profileGifResults .gif-item {
+  grid-column: auto !important;
+  width: 100% !important;
+  max-width: 220px !important;
+  box-sizing: border-box !important;
+}
+
+/* ===== Profile gallery width fixes (paste at end of css/style.css) ===== */
+html,
+body,
+main {
+  width: 100% !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure profile section and its wrappers expand */
+#profile,
+#profileSearchResults,
+#profileGifGallery {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 auto !important;
+  box-sizing: border-box !important;
+  min-width: 320px; /* allow the grid to form multiple columns on normal screens */
+}
+
+/* Make inner grid behave exactly like homepage grid */
+#profileGifResults {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+  gap: 15px !important;
+  width: 100% !important;
+  align-items: start !important;
+}
+
+/* Keep cards compact so multiple columns can fit */
+#profileGifResults .gif-item {
+  grid-column: auto !important;
+  width: 100% !important;
+  max-width: 220px !important;
+  box-sizing: border-box !important;
 }
 
 @media (max-width: 600px) {

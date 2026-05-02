@@ -1,10 +1,11 @@
 const API_KEY = "HWjUB90d31Rn3R81AZn7AEIsGSnjEYCr";
 
 // 2. Fetching
-async function fetchGifs(query) {
+// api.js — support offset + limit
+async function fetchGifs(query = "", offset = 0, limit = 20) {
   const endpoint = query
-    ? `https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${encodeURIComponent(query)}&limit=20&rating=pg-13`
-    : `https://api.giphy.com/v1/gifs/trending?api_key=${API_KEY}&limit=20&rating=pg-13`;
+    ? `https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${encodeURIComponent(query)}&limit=${limit}&offset=${offset}&rating=pg-13`
+    : `https://api.giphy.com/v1/gifs/trending?api_key=${API_KEY}&limit=${limit}&offset=${offset}&rating=pg-13`;
 
   const response = await fetch(endpoint);
   return response.json();

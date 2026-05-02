@@ -105,9 +105,34 @@
         </header>
 
         <h3 class="profile-subheader">Profile Dashboard</h3>
-        <p>Manage your account and explore GIFs.</p>
+        <p id="profileDashboardText">Manage your account and explore GIFs.</p>
 
-        <div id="profileSearchResults" style="display: none"></div>
+        <!-- Profile search gallery (replace existing #profileSearchResults) -->
+        <div id="profileSearchResults">
+          <h2 class="feature-header" id="profileFeatureHeader">Profile GIFs</h2>
+
+          <div class="gif-gallery" id="profileGifGallery">
+            <div
+              id="profileLoadingSpinner"
+              class="spinner"
+              style="display: none"
+            >
+              <p class="loading-text">Loading...</p>
+            </div>
+
+            <!-- Grid container (same role as #gifResults) -->
+            <div id="profileGifResults"></div>
+
+            <!-- Separate Load More button (same style as homepage) -->
+            <button
+              id="profileLoadMoreBtn"
+              class="btn-load-more"
+              style="display: none"
+            >
+              Load More GIFs
+            </button>
+          </div>
+        </div>
       </section>
     </main>
 
