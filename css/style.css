@@ -403,9 +403,18 @@ body {
   scrollbar-color: #6a0dad #1a0b1f;
 }
 
+/* Wrapper for profile search results should be a block, not a grid */
+#profileSearchResults,
+#profileSearchResults.active {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Canonical grid rule applied to grid containers only */
 #gifResults,
-#profileSearchResults.active,
-#favorites,
+#profileGifResults,
+#favoritesGrid,
 #profileFavorites {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -413,26 +422,47 @@ body {
   padding: 10px;
   grid-auto-flow: dense;
   align-items: start;
+  width: 100%;
+  box-sizing: border-box;
 }
 
+/* Unified gallery layout for homepage and profile */
+#gifGallery,
+#profileGifGallery {
+  width: 100%;
+  height: 600px;
+  overflow-y: auto;
+  padding: 10px;
+  border-radius: 8px;
+  background: #1a0b1f;
+  box-sizing: border-box;
+}
+
+/* Wrapper for profile search results should be a block, not a grid */
+
+/* Canonical grid rule applied to both containers */
 #gifResults,
 #profileGifResults {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
-  gap: 15px;
-  padding: 10px;
-  align-items: start;
-}
-
-/* profile grid uses same layout as gifResults */
-#gifResults,
-#profileGifGrid {
-  display: grid !important;
+  display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 15px;
   padding: 10px;
   grid-auto-flow: dense;
   align-items: start;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Shared grid item sizing */
+.gif-item,
+.profile-gif {
+  width: 100%;
+  max-width: 220px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f9f0ff;
+  position: relative;
 }
 
 .gif-item {
@@ -845,16 +875,6 @@ body {
   display: none;
 }
 
-#gifResults,
-#profileSearchResults.active {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
-  padding: 10px;
-  grid-auto-flow: dense;
-  align-items: start;
-}
-
 #gifResults h2,
 #profileSearchResults h2 {
   grid-column: 1 / -1;
@@ -864,66 +884,101 @@ body {
   font-weight: 600;
 }
 
-/* Ensure profile gallery and inner grid use full available width */
-#profile,
-#profileSearchResults,
-#profileGifGallery {
-  width: 100% !important;
-  max-width: none !important;
-  box-sizing: border-box !important;
-}
-
-/* Make inner grid responsive like homepage */
-#profileGifResults {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
-  gap: 15px !important;
-  width: 100% !important;
-  align-items: start !important;
-}
-
-/* Keep cards compact so multiple columns can fit */
-#profileGifResults .gif-item {
-  grid-column: auto !important;
-  width: 100% !important;
-  max-width: 220px !important;
-  box-sizing: border-box !important;
-}
-
-/* ===== Profile gallery width fixes (paste at end of css/style.css) ===== */
+/* Ensure page wrapper uses full width */
 html,
 body,
 main {
-  width: 100% !important;
-  max-width: none !important;
-  box-sizing: border-box !important;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* Ensure profile section and its wrappers expand */
+/* Profile section and gallery should expand like homepage */
 #profile,
 #profileSearchResults,
 #profileGifGallery {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Profile grid matches homepage grid */
+#profileGifResults {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  padding: 10px;
+  align-items: start;
+}
+
+/* Grid items stay compact */
+#profileGifResults .gif-item {
+  grid-column: auto;
+  width: 100%;
+  max-width: 220px;
+  box-sizing: border-box;
+}
+
+#favorites {
+  display: block;
+  background: linear-gradient(135deg, #f9f0ff, #e6ccff, #d1a3ff);
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Keep scrollbar styling consistent */
+#favoritesGallery::-webkit-scrollbar {
+  width: 8px;
+}
+#favoritesGallery::-webkit-scrollbar-track {
+  background: #1a0b1f;
+}
+#favoritesGallery::-webkit-scrollbar-thumb {
+  background-color: #6a0dad;
+  border-radius: 4px;
+  border: 2px solid #1a0b1f;
+}
+
+#favoritesGallery {
+  width: 100%;
+  height: 600px;
+  overflow-y: auto;
+  padding: 10px;
+  border-radius: 8px;
+  background: #1a0b1f;
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: #6a0dad #1a0b1f;
+  background: #1a0b1f; /* ✅ keep purple only here */
+}
+
+#favoritesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  padding: 10px;
+  grid-auto-flow: dense;
+  align-items: start;
+}
+
+#favoritesGrid .gif-item {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f9f0ff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+html,
+body,
+main,
+#profile {
   width: 100% !important;
   max-width: none !important;
-  margin: 0 auto !important;
-  box-sizing: border-box !important;
-  min-width: 320px; /* allow the grid to form multiple columns on normal screens */
-}
-
-/* Make inner grid behave exactly like homepage grid */
-#profileGifResults {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
-  gap: 15px !important;
-  width: 100% !important;
-  align-items: start !important;
-}
-
-/* Keep cards compact so multiple columns can fit */
-#profileGifResults .gif-item {
-  grid-column: auto !important;
-  width: 100% !important;
-  max-width: 220px !important;
   box-sizing: border-box !important;
 }
 

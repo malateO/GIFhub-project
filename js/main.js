@@ -263,7 +263,7 @@ searchForm.addEventListener("submit", async (e) => {
       document.getElementById("profileDashboardText").style.display = "none";
 
       resultsContainer.classList.add("active");
-      resultsContainer.style.display = "grid";
+      resultsContainer.style.display = "block";
 
       displayProfileSearchResults(data.data, query);
     } else {

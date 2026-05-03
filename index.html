@@ -33,9 +33,7 @@
           <div class="profile-dropdown" id="profileDropdown">
             <ul>
               <li>
-                <a href="#" onclick="displayFavorites('profileFavorites')"
-                  >Favorites</a
-                >
+                <a href="#" onclick="showFavoritesPage()">Favorites</a>
               </li>
               <hr class="dropdown-divider" />
               <li><a href="#" onclick="logout()">Logout</a></li>
@@ -132,6 +130,33 @@
               Load More GIFs
             </button>
           </div>
+        </div>
+      </section>
+
+      <!-- Favorites Page -->
+      <section id="favorites" style="display: none">
+        <h2 class="feature-header" id="favoritesHeader">My Favorites</h2>
+
+        <div class="gif-gallery" id="favoritesGallery">
+          <div
+            id="favoritesLoadingSpinner"
+            class="spinner"
+            style="display: none"
+          >
+            <p class="loading-text">Loading Favorites...</p>
+          </div>
+
+          <!-- Grid container (same role as #gifResults / #profileGifResults) -->
+          <div id="favoritesGrid"></div>
+
+          <!-- Separate Load More button -->
+          <button
+            id="favoritesLoadMoreBtn"
+            class="btn-load-more"
+            style="display: none"
+          >
+            Load More Favorites
+          </button>
         </div>
       </section>
     </main>
