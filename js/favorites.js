@@ -12,23 +12,28 @@ function toggleFavorite(gif) {
   let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
   const exists = favorites.some((fav) => fav.id === gif.id);
 
-  if (exists) {
-    favorites = favorites.filter((fav) => fav.id !== gif.id);
-  } else {
-    favorites.push(gif);
-  }
+  favorites = exists
+    ? favorites.filter((fav) => fav.id !== gif.id)
+    : [...favorites, gif];
 
   localStorage.setItem("favorites", JSON.stringify(favorites));
 
-  // Refresh views to stay in sync
-  displayGifs(lastDisplayedGifs);
-  displayFavorites("profileFavorites");
-  displayFavorites("favoritesGrid"); // <-- add this line
+  // Refresh only active view
+  if (document.getElementById("favorites").style.display === "block") {
+    displayFavorites("favoritesGrid", true);
+  } else if (document.getElementById("profile").style.display === "block") {
+    displayFavorites("profileFavorites", true);
+  } else {
+    displayGifs(lastDisplayedGifs);
+  }
 }
 
 function showFavoritesPage() {
   document.getElementById("feature-section").style.display = "none";
   document.getElementById("profile").style.display = "none";
+  document.getElementById("favorites").style.display = "block";
+
+  hideAllSections();
   document.getElementById("favorites").style.display = "block";
 
   displayFavorites("favoritesGrid");

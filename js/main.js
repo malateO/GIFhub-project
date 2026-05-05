@@ -253,6 +253,8 @@ searchForm.addEventListener("submit", async (e) => {
   // profile search container (may be toggled on/off)
   const resultsContainer = document.getElementById("profileSearchResults");
 
+  hideAllSections();
+
   if (query) {
     const data = await fetchGifs(query);
 
@@ -290,3 +292,9 @@ searchForm.addEventListener("submit", async (e) => {
   }
   console.log("search submit:", { query, userProfile });
 });
+
+function hideAllSections() {
+  document.getElementById("feature-section").style.display = "none";
+  document.getElementById("profile").style.display = "none";
+  document.getElementById("favorites").style.display = "none";
+}
