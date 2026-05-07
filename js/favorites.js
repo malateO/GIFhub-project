@@ -22,17 +22,27 @@ function toggleFavorite(gif) {
   if (document.getElementById("favorites").style.display === "block") {
     displayFavorites("favoritesGrid", true);
   } else if (document.getElementById("profile").style.display === "block") {
-    displayFavorites("profileFavorites", true);
-  } else {
-    displayGifs(lastDisplayedGifs);
+    if (profileSearchState.query) {
+      fetchGifs(
+        profileSearchState.query,
+        profileSearchState.offset,
+        profileSearchState.limit,
+      ).then((res) => {
+        displayProfileSearchResults(res.data || [], profileSearchState.query);
+      });
+    }
+  } else if (
+    document.getElementById("feature-section").style.display === "block"
+  ) {
+    if (currentSearchQuery) {
+      displayGifs(lastDisplayedGifs, true, currentSearchQuery);
+    } else {
+      displayGifs(lastDisplayedGifs, false, "");
+    }
   }
 }
 
 function showFavoritesPage() {
-  document.getElementById("feature-section").style.display = "none";
-  document.getElementById("profile").style.display = "none";
-  document.getElementById("favorites").style.display = "block";
-
   hideAllSections();
   document.getElementById("favorites").style.display = "block";
 
