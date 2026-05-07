@@ -1,5 +1,6 @@
 let lastDisplayedGifs = [];
 let infiniteScrollEnabled = false;
+let currentSearchQuery = "";
 
 const gifGallery = document.getElementById("gifGallery");
 const searchBar = document.getElementById("searchBar");
@@ -248,15 +249,15 @@ loadMoreBtn.addEventListener("click", async () => {
 // main.js — fixed search handler
 searchForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const query = searchBar.value.trim();
+  currentSearchQuery = searchBar.value.trim();
 
   // profile search container (may be toggled on/off)
   const resultsContainer = document.getElementById("profileSearchResults");
 
   hideAllSections();
 
-  if (query) {
-    const data = await fetchGifs(query);
+  if (currentSearchQuery) {
+    const data = await fetchGifs(currentSearchQuery);
 
     if (userProfile) {
       // logged in → show results in profile area
@@ -267,7 +268,7 @@ searchForm.addEventListener("submit", async (e) => {
       resultsContainer.classList.add("active");
       resultsContainer.style.display = "block";
 
-      displayProfileSearchResults(data.data, query);
+      displayProfileSearchResults(data.data, currentSearchQuery);
     } else {
       // logged out → ensure profile results are hidden, then show on homepage
       if (resultsContainer) {
@@ -276,7 +277,7 @@ searchForm.addEventListener("submit", async (e) => {
         resultsContainer.innerHTML = "";
       }
 
-      displayGifs(data.data, true, query);
+      displayGifs(data.data, true, currentSearchQuery);
     }
   } else {
     // empty query → reset to trending/feature GIFs
@@ -290,7 +291,7 @@ searchForm.addEventListener("submit", async (e) => {
     const data = await fetchGifs("");
     displayGifs(data.data, false);
   }
-  console.log("search submit:", { query, userProfile });
+  console.log("search submit:", { currentSearchQuery, userProfile });
 });
 
 function hideAllSections() {
