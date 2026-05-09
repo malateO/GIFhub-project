@@ -94,7 +94,9 @@ searchBar.addEventListener(
 // Clear suggestions immediately when Enter is pressed to avoid flash
 searchBar.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
+    e.preventDefault(); // prevent double-submit behavior
     if (suggestionsContainer) suggestionsContainer.innerHTML = "";
+    searchForm.requestSubmit(); //trigger submit right away
   }
 });
 
@@ -128,66 +130,6 @@ searchBar.addEventListener(
     }
   }, 500),
 );
-
-// fixed search submit handler
-searchForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const query = searchBar.value.trim();
-
-  // Clear suggestions right away
-  if (suggestionsContainer) suggestionsContainer.innerHTML = "";
-
-  // profile search container (may be toggled on/off)
-  const resultsContainer = document.getElementById("profileSearchResults");
-
-  if (query) {
-    const data = await fetchGifs(query);
-
-    if (userProfile) {
-      // hide homepage feature section and show profile section
-      const featureSection = document.getElementById("feature-section");
-      const profileSection = document.getElementById("profile");
-      if (featureSection) featureSection.style.display = "none";
-      if (profileSection) profileSection.style.display = "block";
-
-      // optionally hide profile dashboard header/text for search results
-      const profileHeader = document.querySelector(".profile-header");
-      const profileSubheader = document.querySelector(".profile-subheader");
-      const profileDashboardText = document.getElementById(
-        "profileDashboardText",
-      );
-      if (profileHeader) profileHeader.style.display = "none";
-      if (profileSubheader) profileSubheader.style.display = "none";
-      if (profileDashboardText) profileDashboardText.style.display = "none";
-
-      // ensure the purple profile gallery is visible
-      const profileGallery = document.getElementById("profileGifGallery");
-      if (profileGallery) profileGallery.style.display = "block";
-
-      // render results into the profile grid
-      displayProfileSearchResults(data.data, query);
-    } else {
-      // logged out → ensure profile results are hidden, then show on homepage
-      if (resultsContainer) {
-        resultsContainer.classList.remove("active");
-        resultsContainer.style.display = "none";
-        resultsContainer.innerHTML = "";
-      }
-
-      displayGifs(data.data, true, query);
-    }
-  } else {
-    // empty query → reset to trending/feature GIFs
-    if (resultsContainer) {
-      resultsContainer.classList.remove("active");
-      resultsContainer.style.display = "none";
-      resultsContainer.innerHTML = "";
-    }
-
-    const data = await fetchGifs("");
-    displayGifs(data.data, false);
-  }
-});
 
 window.addEventListener("keydown", (e) => {
   console.log("key pressed", e.key);
@@ -246,42 +188,18 @@ loadMoreBtn.addEventListener("click", async () => {
   }
 });
 
-// main.js — fixed search handler
 searchForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  currentSearchQuery = searchBar.value.trim();
 
-  // profile search container (may be toggled on/off)
+  // Clear suggestions immediately
+  if (suggestionsContainer) suggestionsContainer.innerHTML = "";
+  searchBar.blur(); // hides suggestion dropdown like GIPHY
+
+  currentSearchQuery = searchBar.value.trim();
   const resultsContainer = document.getElementById("profileSearchResults");
 
-  hideAllSections();
-
-  if (currentSearchQuery) {
-    const data = await fetchGifs(currentSearchQuery);
-
-    if (userProfile) {
-      // logged in → show results in profile area
-      document.querySelector(".profile-header").style.display = "none";
-      document.querySelector(".profile-subheader").style.display = "none";
-      document.getElementById("profileDashboardText").style.display = "none";
-
-      resultsContainer.classList.add("active");
-      resultsContainer.style.display = "block";
-
-      displayProfileSearchResults(data.data, currentSearchQuery);
-    } else {
-      // logged out → ensure profile results are hidden, then show on homepage
-      if (resultsContainer) {
-        resultsContainer.classList.remove("active");
-        resultsContainer.style.display = "none";
-        resultsContainer.innerHTML = "";
-      }
-
-      displayGifs(data.data, true, currentSearchQuery);
-    }
-  } else {
-    // empty query → reset to trending/feature GIFs
-    // hide profile search results if present
+  // Empty query → reset to trending/feature GIFs
+  if (!currentSearchQuery) {
     if (resultsContainer) {
       resultsContainer.classList.remove("active");
       resultsContainer.style.display = "none";
@@ -289,8 +207,35 @@ searchForm.addEventListener("submit", async (e) => {
     }
 
     const data = await fetchGifs("");
-    displayGifs(data.data, false);
+    displayGifs(data.data, false, "");
+    return;
   }
+
+  // Non-empty query
+  const data = await fetchGifs(currentSearchQuery);
+
+  if (userProfile) {
+    // logged in → show results in profile area
+    document.querySelector(".profile-header").style.display = "none";
+    document.querySelector(".profile-subheader").style.display = "none";
+    document.getElementById("profileDashboardText").style.display = "none";
+
+    resultsContainer.classList.add("active");
+    resultsContainer.style.display = "block";
+
+    // ✅ ensure profile gallery is visible
+    const profileGallery = document.getElementById("profileGifGallery");
+    if (profileGallery) profileGallery.style.display = "block";
+
+    displayProfileSearchResults(data.data, currentSearchQuery);
+  } else {
+    // logged out → homepage search
+    const featureSection = document.getElementById("feature-section");
+    if (featureSection) featureSection.style.display = "block";
+
+    displayGifs(data.data, true, currentSearchQuery);
+  }
+
   console.log("search submit:", { currentSearchQuery, userProfile });
 });
 
