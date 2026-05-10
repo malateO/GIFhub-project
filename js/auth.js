@@ -4,9 +4,18 @@ const authIcon = document.getElementById("authIcon");
 const profileDropdown = document.getElementById("profileDropdown");
 
 const savedProfile = localStorage.getItem("userProfile");
-if (savedProfile && savedProfile !== "null") {
-  userProfile = JSON.parse(savedProfile);
-  updateUI();
+try {
+  const parsed = JSON.parse(savedProfile);
+  if (parsed && parsed.username && parsed.username.trim() !== "") {
+    userProfile = parsed;
+    updateUI();
+  } else {
+    userProfile = null;
+    localStorage.clear(); // clear invalid stub
+  }
+} catch {
+  userProfile = null;
+  localStorage.clear(); // clear invalid JSON
 }
 
 const taglines = [
@@ -44,34 +53,15 @@ async function login(username, password) {
 }
 
 function logout() {
-  // Clear all profile state
-  userProfile = null;
-  localStorage.removeItem("userProfile");
-  localStorage.removeItem("savedAccount");
-
-  // Reset UI
-  updateUI();
-
-  // Reset search state
+  localStorage.clear(); // wipe everything
+  userProfile = null; // enforce null in memory
   currentSearchQuery = "";
   searchBar.value = "";
   profileSearchState = { query: "", offset: 0, limit: 20 };
-
-  // Hide profile containers explicitly
-  const profileSection = document.getElementById("profile");
-  const profileResults = document.getElementById("profileSearchResults");
-  if (profileSection) profileSection.style.display = "none";
-  if (profileResults) {
-    profileResults.classList.remove("active");
-    profileResults.style.display = "none";
-    profileResults.innerHTML = "";
-  }
-
-  // Reset to trending GIFs
-  fetchGifs("").then((data) => {
-    displayGifs(data.data, false, "");
-  });
-
+  lastDisplayedGifs = [];
+  infiniteScrollEnabled = false;
+  updateUI();
+  fetchGifs("").then((data) => displayGifs(data.data, false, ""));
   closeModal();
 }
 
