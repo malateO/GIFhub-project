@@ -193,50 +193,40 @@ searchForm.addEventListener("submit", async (e) => {
 
   // Clear suggestions immediately
   if (suggestionsContainer) suggestionsContainer.innerHTML = "";
-  searchBar.blur(); // hides suggestion dropdown like GIPHY
+  searchBar.blur();
 
   currentSearchQuery = searchBar.value.trim();
   const resultsContainer = document.getElementById("profileSearchResults");
 
-  // Empty query → reset to trending/feature GIFs
+  // Empty query → reset homepage
   if (!currentSearchQuery) {
     if (resultsContainer) {
       resultsContainer.classList.remove("active");
       resultsContainer.style.display = "none";
       resultsContainer.innerHTML = "";
     }
-
     const data = await fetchGifs("");
     displayGifs(data.data, false, "");
     return;
   }
 
-  // Non-empty query
   const data = await fetchGifs(currentSearchQuery);
 
-  if (userProfile) {
-    // logged in → show results in profile area
-    document.querySelector(".profile-header").style.display = "none";
-    document.querySelector(".profile-subheader").style.display = "none";
-    document.getElementById("profileDashboardText").style.display = "none";
-
-    resultsContainer.classList.add("active");
-    resultsContainer.style.display = "block";
-
-    // ✅ ensure profile gallery is visible
+  if (userProfile && userProfile.username) {
+    // logged in → profile search
     const profileGallery = document.getElementById("profileGifGallery");
-    if (profileGallery) profileGallery.style.display = "block";
-
-    displayProfileSearchResults(data.data, currentSearchQuery);
+    if (profileGallery) {
+      profileGallery.style.display = "block";
+      displayProfileSearchResults(data.data, currentSearchQuery);
+    }
   } else {
     // logged out → homepage search
+    userProfile = null; // enforce logout state
+    localStorage.clear(); // clear all localStorage
     const featureSection = document.getElementById("feature-section");
     if (featureSection) featureSection.style.display = "block";
-
     displayGifs(data.data, true, currentSearchQuery);
   }
-
-  console.log("search submit:", { currentSearchQuery, userProfile });
 });
 
 function hideAllSections() {
