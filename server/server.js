@@ -19,4 +19,8 @@ app.get("/", (req, res) => {
 const authRoutes = require("./routes/auth");
 app.use("/api", authRoutes);
 
-app.listen(5000, () => console.log("✅ Server running or port 5000"));
+const favoritesRoutes = require("./routes/favorites");
+app.use("/api", favoritesRoutes);
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));

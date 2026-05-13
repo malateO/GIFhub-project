@@ -2,6 +2,71 @@ POST http://localhost:5000/api/signup
 Content-Type: application/json
 
 {
+  "username": "oliver1",
+  "email": "oliver1@example.com",
+  "password": "12345"
+}
+
+
+### Signup with email + hashed password
+POST http://localhost:5000/api/signup
+Content-Type: application/json
+
+{
+  "username": "oliver",
+  "email": "oliver@example.com",
+  "password": "12345"
+}
+
+### Login with bcrypt
+POST http://localhost:5000/api/login
+Content-Type: application/json
+
+{
   "username": "oliver",
   "password": "12345"
 }
+
+### Signup (with email + hashed password)
+POST http://localhost:5000/api/signup
+Content-Type: application/json
+
+{
+  "username": "oliverjwt",
+  "email": "oliverjwt@example.com",
+  "password": "12345"
+}
+
+### Login (get JWT token)
+POST http://localhost:5000/api/login
+Content-Type: application/json
+
+{
+  "username": "oliverjwt",
+  "password": "12345"
+}
+
+### Protected route (favorites example)
+GET http://localhost:5000/api/favorites
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDRiZGFkMDcxZWZiYmNhYTJjM2RkNiIsInVzZXJuYW1lIjoib2xpdmVyand0IiwiZW1haWwiOiJvbGl2ZXJqd3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3Nzg2OTU2NzQsImV4cCI6MTc3ODY5OTI3NH0.IYo3SgQl7YfM52Qf8GAHr1LfpMQijBnmiHkUaUqdWZw
+
+### Login to get token
+POST http://localhost:5000/api/login
+Content-Type: application/json
+
+{
+  "username": "oliverjwt",
+  "password": "12345"
+}
+
+### Valid token
+GET http://localhost:5000/api/favorites
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDRiZGFkMDcxZWZiYmNhYTJjM2RkNiIsInVzZXJuYW1lIjoib2xpdmVyand0IiwiZW1haWwiOiJvbGl2ZXJqd3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3Nzg2OTk0MzYsImV4cCI6MTc3ODcwMzAzNn0.ZCWzWuJmoiTxMwPlfQme0iF0pCYFd6l_ILYnIbAypWQ
+
+### No token
+GET http://localhost:5000/api/favorites
+
+### Invalid token
+GET http://localhost:5000/api/favorites
+Authorization: Bearer invalidtoken123
+
