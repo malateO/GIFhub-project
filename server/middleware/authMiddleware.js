@@ -6,9 +6,14 @@ function authenticateToken(req, res, next) {
 
   if (!token) return res.status(401).send("Access denied");
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) return res.status(403).send("Invalid token");
-    req.user = user;
+
+    if (!decoded.id) {
+      return res.status(400).json({ error: "Token missing user id" });
+    }
+
+    req.user = { id: decoded.id };
     next();
   });
 }
