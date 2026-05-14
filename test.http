@@ -61,7 +61,7 @@ Content-Type: application/json
 
 ### Valid token
 GET http://localhost:5000/api/favorites
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDRiZGFkMDcxZWZiYmNhYTJjM2RkNiIsInVzZXJuYW1lIjoib2xpdmVyand0IiwiZW1haWwiOiJvbGl2ZXJqd3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3Nzg2OTk0MzYsImV4cCI6MTc3ODcwMzAzNn0.ZCWzWuJmoiTxMwPlfQme0iF0pCYFd6l_ILYnIbAypWQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDRiZGFkMDcxZWZiYmNhYTJjM2RkNiIsInVzZXJuYW1lIjoib2xpdmVyand0IiwiZW1haWwiOiJvbGl2ZXJqd3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3Nzg3ODA5NjYsImV4cCI6MTc3ODc4NDU2Nn0.LWjmMsS-izGGUJq3VS3Gxli9CLmP9fpxJkIT2r9OGoo
 
 ### No token
 GET http://localhost:5000/api/favorites
@@ -69,4 +69,22 @@ GET http://localhost:5000/api/favorites
 ### Invalid token
 GET http://localhost:5000/api/favorites
 Authorization: Bearer invalidtoken123
+
+### Save GIF
+POST http://localhost:5000/api/favorites
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDRiZGFkMDcxZWZiYmNhYTJjM2RkNiIsInVzZXJuYW1lIjoib2xpdmVyand0IiwiZW1haWwiOiJvbGl2ZXJqd3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3Nzg3ODE3ODIsImV4cCI6MTc3ODc4NTM4Mn0.4j2cNlLrUUHAulY5NPLN9K404YGS1ihgELTa_1hE-Ss
+Content-Type: application/json
+
+{
+  "gifId": "abc123"
+}
+
+### Get favorites
+GET http://localhost:5000/api/favorites
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDRiZGFkMDcxZWZiYmNhYTJjM2RkNiIsInVzZXJuYW1lIjoib2xpdmVyand0IiwiZW1haWwiOiJvbGl2ZXJqd3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3Nzg3ODA5NjYsImV4cCI6MTc3ODc4NDU2Nn0.LWjmMsS-izGGUJq3VS3Gxli9CLmP9fpxJkIT2r9OGoo
+
+### Remove GIF
+DELETE http://localhost:5000/api/favorites/abc123
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDRiZGFkMDcxZWZiYmNhYTJjM2RkNiIsInVzZXJuYW1lIjoib2xpdmVyand0IiwiZW1haWwiOiJvbGl2ZXJqd3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3Nzg3ODA5NjYsImV4cCI6MTc3ODc4NDU2Nn0.LWjmMsS-izGGUJq3VS3Gxli9CLmP9fpxJkIT2r9OGoo
+
 
