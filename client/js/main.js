@@ -18,8 +18,9 @@ const authPopup = document.getElementById("auth-popup");
 
 async function loadMoreGifs(query) {
   try {
-    const data = await fetchGifs(query);
-    displayGifs([...lastDisplayedGifs, ...data.data]);
+    const data = await fetchGifs(query); // ✅ fetch GIFs
+    const favorites = await getFavorites(); // ✅ fetch backend favorites
+    displayGifs([...lastDisplayedGifs, ...data.data], favorites);
   } catch (error) {
     showError("Oops! something went wrong!");
   } finally {
@@ -43,11 +44,6 @@ gifGallery.addEventListener("scroll", onGalleryScroll);
 
 // when disabling/resetting:
 gifGallery.removeEventListener("scroll", onGalleryScroll);
-
-fetchGifs("").then((data) => displayGifs(data.data));
-// if (userProfile) {
-//   displayFavorites("profileFavorites", "profile-gif");
-// }
 
 // shared suggestions container (declare near other DOM refs)
 const suggestionsContainer = document.getElementById("searchSuggestions");
@@ -82,6 +78,7 @@ searchBar.addEventListener(
     try {
       const data = await fetchGifs("");
       // displayGifs expects (gifs, isSearch, query)
+      const favorites = await getFavorites();
       displayGifs(data.data, false, "");
     } catch (err) {
       showError("Could not load trending GIFs. Try again.");
@@ -188,6 +185,19 @@ loadMoreBtn.addEventListener("click", async () => {
   }
 });
 
+function hideAllSections() {
+  document.getElementById("feature-section").style.display = "none";
+  document.getElementById("profile").style.display = "none";
+  document.getElementById("favorites").style.display = "none";
+}
+
+// Initial load of trending GIFs
+fetchGifs("").then(async (data) => {
+  const favorites = await getFavorites(); // ✅ fetch backend favorites
+  displayGifs(data.data, favorites, false, ""); // ✅ pass favorites in
+});
+
+// Search form submit handler
 searchForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -206,31 +216,27 @@ searchForm.addEventListener("submit", async (e) => {
       resultsContainer.innerHTML = "";
     }
     const data = await fetchGifs("");
-    displayGifs(data.data, false, "");
+    const favorites = await getFavorites(); // ✅ fetch backend favorites
+    displayGifs(data.data, favorites, false, "");
     return;
   }
 
   const data = await fetchGifs(currentSearchQuery);
+  const favorites = await getFavorites();
 
   if (userProfile && userProfile.username) {
     // logged in → profile search
     const profileGallery = document.getElementById("profileGifGallery");
     if (profileGallery) {
       profileGallery.style.display = "block";
-      displayProfileSearchResults(data.data, currentSearchQuery);
+      displayProfileSearchResults(data.data, favorites, currentSearchQuery); // ✅ pass favorites in
     }
   } else {
     // logged out → homepage search
-    userProfile = null; // enforce logout state
-    localStorage.clear(); // clear all localStorage
+    userProfile = null;
+    localStorage.clear();
     const featureSection = document.getElementById("feature-section");
     if (featureSection) featureSection.style.display = "block";
-    displayGifs(data.data, true, currentSearchQuery);
+    displayGifs(data.data, favorites, true, currentSearchQuery);
   }
 });
-
-function hideAllSections() {
-  document.getElementById("feature-section").style.display = "none";
-  document.getElementById("profile").style.display = "none";
-  document.getElementById("favorites").style.display = "none";
-}

@@ -39,7 +39,19 @@ router.get("/favorites", authenticateToken, async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    res.json({ favorites: user.favorites });
+
+    // Fetch full GIF objects from GIPHY API
+    const gifDetails = await Promise.all(
+      user.favorites.map(async (id) => {
+        const response = await fetch(
+          `https://api.giphy.com/v1/gifs/${id}?api_key=${process.env.GIPHY_KEY}`,
+        );
+        const data = await response.json();
+        return data.data; //full GIF object
+      }),
+    );
+
+    res.json({ favorites: gifDetails });
   } catch (err) {
     console.error("Error retrieving favorites:", err);
     res.status(500).json({ error: "Server error" });

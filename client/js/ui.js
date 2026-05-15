@@ -1,4 +1,14 @@
-function displayGifs(gifs, isSearch = false, query = "") {
+async function getFavorites() {
+  const token = localStorage.getItem("token");
+  if (!token) return [];
+  const res = await fetch("http://localhost:5000/api/favorites", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  return data.favorites || [];
+}
+
+function displayGifs(gifs, favorites, isSearch = false, query = "") {
   lastDisplayedGifs = gifs;
   const featureHeader = document.querySelector(".feature-header");
 
@@ -44,8 +54,8 @@ function displayGifs(gifs, isSearch = false, query = "") {
       const favButton = document.createElement("button");
       favButton.className = "fav-btn";
 
-      const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-      const isFavorited = favorites.some((fav) => fav.id === gif.id);
+      // ✅ Use favorites passed in as argument
+      const isFavorited = favorites.includes(gif.id);
 
       favButton.textContent = isFavorited ? "❤️" : "🤍";
       if (isFavorited) favButton.classList.add("active");
@@ -68,25 +78,7 @@ function displayGifs(gifs, isSearch = false, query = "") {
   }
 }
 
-function showError(message) {
-  const resultContainer = document.getElementById("gifResults");
-  resultContainer.innerHTML = "";
-  const errorCard = document.createElement("div");
-  errorCard.className = "no-results";
-  errorCard.textContent = message;
-
-  resultContainer.appendChild(errorCard);
-}
-
-// ui.js — replace existing displayProfileSearchResults with this
-// ui.js — profile search renderer (paste/replace existing displayProfileSearchResults)
-let profileSearchState = {
-  query: "",
-  offset: 0,
-  limit: 20,
-};
-
-function displayProfileSearchResults(gifs, query = "") {
+async function displayProfileSearchResults(gifs, favorites, query = "") {
   // reset state when new query
   if (query !== profileSearchState.query) {
     profileSearchState.query = query;
@@ -134,12 +126,12 @@ function displayProfileSearchResults(gifs, query = "") {
     img.src = imgUrl;
     img.alt = gif.title || "GIF";
 
-    // Favorite button (same behavior)
+    // Favorite button (backend-aware)
     if (userProfile) {
       const favButton = document.createElement("button");
       favButton.className = "fav-btn";
 
-      const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+      // ✅ Use backend favorites passed in
       const isFavorited = favorites.some((fav) => fav.id === gif.id);
 
       favButton.textContent = isFavorited ? "❤️" : "🤍";
@@ -173,8 +165,12 @@ function displayProfileSearchResults(gifs, query = "") {
         profileSearchState.offset,
         profileSearchState.limit,
       );
-      // append new results
-      displayProfileSearchResults(res.data || [], profileSearchState.query);
+      const newFavorites = await getFavorites(); // ✅ fetch backend favorites
+      displayProfileSearchResults(
+        res.data || [],
+        newFavorites,
+        profileSearchState.query,
+      );
     } catch (err) {
       console.error("Profile Load More failed", err);
     } finally {
