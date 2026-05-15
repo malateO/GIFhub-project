@@ -3,19 +3,25 @@ let userProfile = null;
 const authIcon = document.getElementById("authIcon");
 const profileDropdown = document.getElementById("profileDropdown");
 
-const savedProfile = localStorage.getItem("userProfile");
-try {
-  const parsed = JSON.parse(savedProfile);
-  if (parsed && parsed.username && parsed.username.trim() !== "") {
-    userProfile = parsed;
-    updateUI();
-  } else {
-    userProfile = null;
-    localStorage.clear(); // clear invalid stub
-  }
-} catch {
+// Check if a token exists in localStorage
+const token = localStorage.getItem("token");
+if (token) {
+  // Option 1: If backend has a /api/me route, fetch profile info
+  fetch("http://localhost:5000/api/me", {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      userProfile = { username: data.username, email: data.email };
+      updateUI();
+    })
+    .catch(() => {
+      userProfile = null;
+      localStorage.clear();
+    });
+} else {
   userProfile = null;
-  localStorage.clear(); // clear invalid JSON
+  updateUI();
 }
 
 const taglines = [
@@ -37,38 +43,70 @@ function createStubUser(username) {
 }
 
 async function login(username, password) {
-  //ignore password for now
-  if (userProfile) return;
+  try {
+    const res = await fetch("http://localhost:5000/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+    const data = await res.json();
 
-  userProfile = createStubUser(username);
-  updateUI();
+    if (res.ok) {
+      // ✅ Save JWT only
+      localStorage.setItem("token", data.token);
 
-  const query = searchBar.value.trim();
-  const data = await fetchGifs(query || "");
-  displayGifs(data.data, true, query);
+      // ✅ Backend must return username + email, or decode from JWT
+      userProfile = { username: data.username, email: data.email };
 
-  localStorage.setItem("userProfile", JSON.stringify(userProfile));
-
-  closeModal();
+      updateUI();
+      closeModal();
+    } else {
+      alert(data.error || "Login failed");
+    }
+  } catch (err) {
+    console.error("Login error:", err);
+  }
 }
 
 function logout() {
   localStorage.clear(); // wipe everything
-  userProfile = null; // enforce null in memory
+  userProfile = null;
   currentSearchQuery = "";
   searchBar.value = "";
   profileSearchState = { query: "", offset: 0, limit: 20 };
   lastDisplayedGifs = [];
   infiniteScrollEnabled = false;
   updateUI();
-  fetchGifs("").then((data) => displayGifs(data.data, false, ""));
+
+  // ✅ Fetch favorites-aware GIFs
+  fetchGifs("").then(async (data) => {
+    const favorites = await getFavorites();
+    displayGifs(data.data, favorites, false, "");
+  });
+
   closeModal();
 }
 
-function createAccount(username, password) {
-  userProfile = createStubUser(username);
-  updateUI();
-  closeModal();
+async function createAccount(username, password, email) {
+  try {
+    const res = await fetch("http://localhost:5000/api/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, email, password }),
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      localStorage.setItem("token", data.token);
+      userProfile = { username: data.username, email: data.email };
+      updateUI();
+      closeModal();
+    } else {
+      alert(data.error || "Signup failed");
+    }
+  } catch (err) {
+    console.error("Signup error:", err);
+  }
 }
 
 function getRandomTagline() {
@@ -234,3 +272,14 @@ signupForm.addEventListener("submit", (e) => {
 
   createAccount(username, password, email);
 });
+
+async function loadProfileFavorites() {
+  const token = localStorage.getItem("token");
+  const res = await fetch("http://localhost:5000/api/favorites", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+
+  // ✅ Make sure renderFavorites is implemented
+  renderFavorites(data.favorites);
+}

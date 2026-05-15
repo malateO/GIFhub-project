@@ -3,42 +3,36 @@ let favoritesState = {
   limit: 20,
 };
 
-function toggleFavorite(gif) {
+async function toggleFavorite(gif) {
   if (!userProfile) {
-    alert("Please log in to save favorites!");
+    alert("Please log in to save Favorites!");
     return;
   }
+  const token = localStorage.getItem("token");
+  const favorites = await fetch("http://localhost:5000/api/favorites", {
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((res) => res.json());
 
-  let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-  const exists = favorites.some((fav) => fav.id === gif.id);
+  const exists = favorites.favorites.some((fav) => fav.id === gif.id);
 
-  favorites = exists
-    ? favorites.filter((fav) => fav.id !== gif.id)
-    : [...favorites, gif];
-
-  localStorage.setItem("favorites", JSON.stringify(favorites));
-
-  // Refresh only active view
+  if (exists) {
+    await fetch(`http://localhost:5000/api/favorites/${gif.id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } else {
+    await fetch("http://localhost:5000/api/favorites", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ gifId: gif.id }),
+    });
+  }
+  // Refresh favoritess view
   if (document.getElementById("favorites").style.display === "block") {
     displayFavorites("favoritesGrid", true);
-  } else if (document.getElementById("profile").style.display === "block") {
-    if (profileSearchState.query) {
-      fetchGifs(
-        profileSearchState.query,
-        profileSearchState.offset,
-        profileSearchState.limit,
-      ).then((res) => {
-        displayProfileSearchResults(res.data || [], profileSearchState.query);
-      });
-    }
-  } else if (
-    document.getElementById("feature-section").style.display === "block"
-  ) {
-    if (currentSearchQuery) {
-      displayGifs(lastDisplayedGifs, true, currentSearchQuery);
-    } else {
-      displayGifs(lastDisplayedGifs, false, "");
-    }
   }
 }
 
@@ -49,12 +43,19 @@ function showFavoritesPage() {
   displayFavorites("favoritesGrid");
 }
 
-function displayFavorites(containerId, reset = true) {
+async function displayFavorites(containerId, reset = true) {
   if (!userProfile) return;
 
-  const allFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
-  const container = document.getElementById(containerId);
+  const container = document.getElementById(containerId); // ✅ define container
   if (!container) return;
+
+  const token = localStorage.getItem("token");
+  const res = await fetch("http://localhost:5000/api/favorites", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const data = await res.json();
+  const allFavorites = data.favorites || [];
 
   if (reset) {
     favoritesState.offset = 0;
@@ -91,9 +92,9 @@ function displayFavorites(containerId, reset = true) {
     favButton.className = "fav-btn active";
     favButton.textContent = "❤️";
 
-    favButton.addEventListener("click", () => {
-      toggleFavorite(gif);
-      displayFavorites(containerId, true);
+    favButton.addEventListener("click", async () => {
+      await toggleFavorite(gif);
+      displayFavorites(containerId, true); // ✅ refresh after toggle
     });
 
     gifWrapper.appendChild(img);
