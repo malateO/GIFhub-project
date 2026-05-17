@@ -11,22 +11,6 @@ async function fetchGifs(query = "", offset = 0, limit = 20) {
   return response.json();
 }
 
-async function handleSearch(event) {
-  const query = event.target.value.trim();
-  const spinner = document.getElementById("loadingSpinner");
-  if (spinner) spinner.style.display = "block";
-
-  try {
-    const data = await fetchGifs(query);
-    return data.data;
-  } catch (error) {
-    console.error("Error fetching GIF's", error);
-    return null;
-  } finally {
-    if (spinner) spinner.style.display = "none";
-  }
-}
-
 async function fetchSuggestions(query) {
   const endpoint = `https://api.giphy.com/v1/tags/related/${encodeURIComponent(query)}?api_key=${API_KEY}`;
   const response = await fetch(endpoint);

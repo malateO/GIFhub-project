@@ -91,3 +91,5 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDRiZGFkM
 ### Test /api/me
 GET http://localhost:5000/api/me
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDRiZGFkMDcxZWZiYmNhYTJjM2RkNiIsInVzZXJuYW1lIjoib2xpdmVyand0IiwiZW1haWwiOiJvbGl2ZXJqd3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3Nzg4NzE0MDAsImV4cCI6MTc3ODg3NTAwMH0.XtVIPcRzePJDpToq5goAjlAcjr56zcHd7GKUHBaIc2Y
+
+

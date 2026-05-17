@@ -1,27 +1,45 @@
-const express = require("express");
+// const fetch = require("node-fetch");
+// const express = require("express");
+// const router = express.Router();
+// const authenticateToken = require("../middleware/authMiddleware");
+// const User = require("../models/User");
+
+import express from "express";
+import fetch from "node-fetch";
+import authenticateToken from "../middleware/authMiddleware.js";
+import User from "../models/User.js";
+
 const router = express.Router();
-const authenticateToken = require("../middleware/authMiddleware");
-const User = require("../models/User");
 
 // Save GIF to favorites (POST)
 router.post("/favorites", authenticateToken, async (req, res) => {
   try {
-    const { gifId } = req.body;
+    const { gifId, title, images } = req.body;
 
     // Check if gifId was provided
     if (!gifId) {
       return res.status(400).json({ error: "gifId required" });
     }
 
+    const favorite = {
+      id: gifId,
+      title,
+      images,
+    };
+
     // Find the logged-in user
     const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+    if (!user) return res.status(404).json({ error: "User not found" });
 
     // Add gifId if not already in favorites
-    if (!user.favorites.includes(gifId)) {
-      user.favorites.push(gifId);
+    const exists =
+      Array.isArray(user.favorites) &&
+      user.favorites.some((fav) =>
+        typeof fav === "string" ? fav === gifId : fav?.id === gifId,
+      );
+
+    if (!exists) {
+      user.favorites.push(favorite);
       await user.save();
     }
 
@@ -36,18 +54,20 @@ router.post("/favorites", authenticateToken, async (req, res) => {
 router.get("/favorites", authenticateToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+    if (!user) return res.status(404).json({ error: "User not found" });
 
     // Fetch full GIF objects from GIPHY API
     const gifDetails = await Promise.all(
-      user.favorites.map(async (id) => {
-        const response = await fetch(
-          `https://api.giphy.com/v1/gifs/${id}?api_key=${process.env.GIPHY_KEY}`,
-        );
-        const data = await response.json();
-        return data.data; //full GIF object
+      user.favorites.map(async (fav) => {
+        if (typeof fav === "string") {
+          const response = await fetch(
+            `https://api.giphy.com/v1/gifs/${fav}?api_key=${process.env.GIPHY_KEY}`,
+          );
+          const data = await response.json();
+          return data.data;
+        } else {
+          return fav; // already full object
+        }
       }),
     );
 
@@ -64,11 +84,12 @@ router.delete("/favorites/:gifId", authenticateToken, async (req, res) => {
     const { gifId } = req.params;
     const user = await User.findById(req.user.id);
 
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+    if (!user) return res.status(404).json({ error: "User not found" });
 
-    user.favorites = user.favorites.filter((id) => id !== gifId);
+    user.favorites = user.favorites.filter((fav) =>
+      typeof fav === "string" ? fav !== gifId : fav?.id !== gifId,
+    );
+
     await user.save();
 
     res.json({
@@ -81,4 +102,4 @@ router.delete("/favorites/:gifId", authenticateToken, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

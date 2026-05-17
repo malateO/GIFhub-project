@@ -55,7 +55,7 @@ function displayGifs(gifs, favorites, isSearch = false, query = "") {
       favButton.className = "fav-btn";
 
       // ✅ Use favorites passed in as argument
-      const isFavorited = favorites.includes(gif.id);
+      const isFavorited = favorites.some((fav) => fav.id === gif.id);
 
       favButton.textContent = isFavorited ? "❤️" : "🤍";
       if (isFavorited) favButton.classList.add("active");
@@ -79,6 +79,7 @@ function displayGifs(gifs, favorites, isSearch = false, query = "") {
 }
 
 async function displayProfileSearchResults(gifs, favorites, query = "") {
+  lastDisplayedGifs = gifs;
   // reset state when new query
   if (query !== profileSearchState.query) {
     profileSearchState.query = query;

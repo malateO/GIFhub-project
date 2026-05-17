@@ -1,7 +1,13 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-require("dotenv").config();
+// const express = require("express");
+// const mongoose = require("mongoose");
+// const cors = require("cors");
+// require("dotenv").config();
+
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 app.use(express.json());
@@ -16,10 +22,11 @@ app.get("/", (req, res) => {
   res.send("Backend is running");
 });
 
-const authRoutes = require("./routes/auth");
+// Import routes in ES module style
+import authRoutes from "./routes/auth.js";
 app.use("/api", authRoutes);
 
-const favoritesRoutes = require("./routes/favorites");
+import favoritesRoutes from "./routes/favorites.js";
 app.use("/api", favoritesRoutes);
 
 const PORT = process.env.PORT || 5000;
