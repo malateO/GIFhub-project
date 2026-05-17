@@ -1,19 +1,21 @@
-const bcrypt = require("bcrypt");
-const express = require("express");
+import bcrypt from "bcrypt";
+import express from "express";
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
+
 const router = express.Router();
-const User = require("../models/User");
-const jwt = require("jsonwebtoken");
 
 // POST /api/signup
 router.post("/signup", async (req, res) => {
   try {
-    const { username, password, email } = req.body; // Step A: Get data from request
+    const { username, password, email } = req.body;
 
     // Hash password before saving
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ username, email, password: hashedPassword }); // Step B: Create new user
+    const newUser = new User({ username, email, password: hashedPassword });
 
-    await newUser.save(); // Step C: Save to MongoDB
+    await newUser.save();
+
     // Generate JWT
     const token = jwt.sign(
       {
@@ -25,11 +27,13 @@ router.post("/signup", async (req, res) => {
       { expiresIn: "1h" },
     );
 
-    res
-      .status(201)
-      .json({ token, username: newUser.username, email: newUser.email }); //Step D: Respond
+    res.status(201).json({
+      token,
+      username: newUser.username,
+      email: newUser.email,
+    });
   } catch (err) {
-    if (err.code === 1100) {
+    if (err.code === 11000) {
       // Duplicate key error (username or email already exists)
       return res
         .status(400)
@@ -38,20 +42,20 @@ router.post("/signup", async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
 // POST /api/login
 router.post("/login", async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, email, password } = req.body;
 
-    const user = await User.findOne({ username });
+    const user = await User.findOne(username ? { username } : { email });
     if (!user) return res.status(400).json({ error: "User not found" });
 
-    // Compare plain password with hashed password
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword)
       return res.status(400).json({ error: "Invalid Password" });
 
-    //Generate JWT token
+    // Generate JWT token
     const token = jwt.sign(
       { id: user._id, username: user.username, email: user.email },
       process.env.JWT_SECRET,
@@ -64,7 +68,6 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// GET /api/me
 // GET /api/me
 router.get("/me", async (req, res) => {
   try {
@@ -87,4 +90,4 @@ router.get("/me", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

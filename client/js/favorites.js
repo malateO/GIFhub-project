@@ -4,35 +4,56 @@ let favoritesState = {
 };
 
 async function toggleFavorite(gif) {
+  // Prevent favoriting if not logged in
   if (!userProfile) {
     alert("Please log in to save Favorites!");
     return;
   }
-  const token = localStorage.getItem("token");
-  const favorites = await fetch("http://localhost:5000/api/favorites", {
-    headers: { Authorization: `Bearer ${token}` },
-  }).then((res) => res.json());
 
-  const exists = favorites.favorites.some((fav) => fav.id === gif.id);
+  // Get current favorites from backend
+  const favorites = await getFavorites();
+  const isFavorited = favorites.some((fav) => fav.id === gif.id);
 
-  if (exists) {
+  // Add or remove favorite
+  if (isFavorited) {
     await fetch(`http://localhost:5000/api/favorites/${gif.id}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
   } else {
     await fetch("http://localhost:5000/api/favorites", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
-      body: JSON.stringify({ gifId: gif.id }),
+      body: JSON.stringify({
+        gifId: gif.id,
+        title: gif.title,
+        images: gif.images, // ✅ send full images object
+      }),
     });
   }
-  // Refresh favoritess view
+
+  // ✅ Refresh favorites after toggle
+  const newFavorites = await getFavorites();
+
+  // Refresh whichever view is active
   if (document.getElementById("favorites").style.display === "block") {
     displayFavorites("favoritesGrid", true);
+  } else if (document.getElementById("profile").style.display === "block") {
+    displayProfileSearchResults(
+      lastDisplayedGifs,
+      newFavorites,
+      currentSearchQuery,
+    );
+  } else {
+    displayGifs(
+      lastDisplayedGifs,
+      newFavorites,
+      !!currentSearchQuery,
+      currentSearchQuery,
+    );
   }
 }
 

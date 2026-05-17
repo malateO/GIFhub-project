@@ -22,7 +22,7 @@ async function loadMoreGifs(query) {
     const favorites = await getFavorites(); // ✅ fetch backend favorites
     displayGifs([...lastDisplayedGifs, ...data.data], favorites);
   } catch (error) {
-    showError("Oops! something went wrong!");
+    console.error("GIF fetch failed", error);
   } finally {
     spinner.style.display = "none";
   }
@@ -65,7 +65,8 @@ searchBar.addEventListener(
     if (resultsContainer) {
       resultsContainer.classList.remove("active");
       resultsContainer.style.display = "none";
-      resultsContainer.innerHTML = "";
+      const profileGrid = document.getElementById("profileGifResults");
+      if (profileGrid) profileGrid.innerHTML = "";
     }
 
     // Reset infinite scroll state so Load More behaves predictably
@@ -79,9 +80,9 @@ searchBar.addEventListener(
       const data = await fetchGifs("");
       // displayGifs expects (gifs, isSearch, query)
       const favorites = await getFavorites();
-      displayGifs(data.data, false, "");
+      displayGifs(data.data, favorites, false, "");
     } catch (err) {
-      showError("Could not load trending GIFs. Try again.");
+      console.error("GIF fetch failed", err);
     } finally {
       if (spinner) spinner.style.display = "none";
     }
@@ -211,9 +212,10 @@ searchForm.addEventListener("submit", async (e) => {
   // Empty query → reset homepage
   if (!currentSearchQuery) {
     if (resultsContainer) {
-      resultsContainer.classList.remove("active");
       resultsContainer.style.display = "none";
-      resultsContainer.innerHTML = "";
+      resultsContainer.classList.remove("active");
+      const profileGrid = document.getElementById("profileGifResults");
+      if (profileGrid) profileGrid.innerHTML = "";
     }
     const data = await fetchGifs("");
     const favorites = await getFavorites(); // ✅ fetch backend favorites
@@ -227,9 +229,16 @@ searchForm.addEventListener("submit", async (e) => {
   if (userProfile && userProfile.username) {
     // logged in → profile search
     const profileGallery = document.getElementById("profileGifGallery");
+    const resultsContainer = document.getElementById("profileSearchResults");
+
     if (profileGallery) {
       profileGallery.style.display = "block";
       displayProfileSearchResults(data.data, favorites, currentSearchQuery); // ✅ pass favorites in
+    }
+
+    if (resultsContainer) {
+      resultsContainer.style.display = "block";
+      resultsContainer.classList.add("active");
     }
   } else {
     // logged out → homepage search

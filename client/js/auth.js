@@ -33,21 +33,16 @@ const taglines = [
   "Legit Aura Farmer 🌾✨",
 ];
 
-//-------Account Stub-------//
-function createStubUser(username) {
-  return {
-    username: username,
-    email: `${username}@example.com`,
-    favorites: [],
-  };
-}
-
-async function login(username, password) {
+async function login(identifier, password) {
   try {
     const res = await fetch("http://localhost:5000/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({
+        username: identifier,
+        email: identifier,
+        password,
+      }),
     });
     const data = await res.json();
 
@@ -69,16 +64,20 @@ async function login(username, password) {
 }
 
 function logout() {
-  localStorage.clear(); // wipe everything
+  localStorage.clear();
   userProfile = null;
   currentSearchQuery = "";
   searchBar.value = "";
   profileSearchState = { query: "", offset: 0, limit: 20 };
   lastDisplayedGifs = [];
   infiniteScrollEnabled = false;
+
+  // ✅ Clear suggestion dropdown
+  const suggestionsContainer = document.getElementById("searchSuggestions");
+  if (suggestionsContainer) suggestionsContainer.innerHTML = "";
+
   updateUI();
 
-  // ✅ Fetch favorites-aware GIFs
   fetchGifs("").then(async (data) => {
     const favorites = await getFavorites();
     displayGifs(data.data, favorites, false, "");
@@ -240,12 +239,13 @@ signupTab.addEventListener("click", () => {
 // login handler
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  const username = document.getElementById("loginUsername").value;
+  const identifier = document.getElementById("loginUsername").value;
   const password = document.getElementById("loginPassword").value;
-  login(username, password);
+
+  login(identifier, password);
+
   document.getElementById("loginUsername").value = "";
   document.getElementById("loginPassword").value = "";
-  //uses stub login
 
   if (document.getElementById("rememberMe").checked) {
     localStorage.setItem("savedAccount", username);
