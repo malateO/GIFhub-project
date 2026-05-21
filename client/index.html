@@ -3,9 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Linked stylesheet for clean separation of styles -->
     <link rel="stylesheet" href="css/style.css" />
-    <!-- Google icons for search symbol -->
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
@@ -13,17 +11,13 @@
     <title>GifHub</title>
   </head>
   <body>
-    <!-- Navigation bar -->
     <nav class="navbar">
       <div class="navdiv">
-        <!-- Logo-->
         <div class="navlogo"><a href="#">GifHub</a></div>
-        <!-- Center Links -->
         <ul>
           <li class="navlist"><a href="#">Forum</a></li>
           <li class="navlist"><a href="#">About</a></li>
         </ul>
-        <!-- Right edge login/signup icon-->
         <div class="auth-icon" id="authIcon">
           <span class="material-symbols-outlined" id="guestIcon"
             >account_circle</span
@@ -32,9 +26,8 @@
 
           <div class="profile-dropdown" id="profileDropdown">
             <ul>
-              <li>
-                <a href="#" onclick="showFavoritesPage()">Favorites</a>
-              </li>
+              <li><a href="#" onclick="showProfilePage()">Profile</a></li>
+              <li><a href="#" onclick="showFavoritesPage()">Favorites</a></li>
               <hr class="dropdown-divider" />
               <li><a href="#" onclick="logout()">Logout</a></li>
             </ul>
@@ -42,7 +35,7 @@
         </div>
       </div>
     </nav>
-    <!-- Mains content wrapper -->
+
     <main>
       <div class="title-search">
         <section class="hero">
@@ -52,9 +45,9 @@
           </h2>
         </section>
       </div>
-      <!-- Search bar -->
+
       <section class="search-block">
-        <form class="search-form">
+        <form class="search-form" id="searchForm">
           <div class="search">
             <span class="material-symbols-outlined"> search </span>
             <input
@@ -68,7 +61,7 @@
           </div>
         </form>
       </section>
-      <!-- Home section -->
+
       <section id="home-page">
         <section id="feature-section">
           <h2 class="feature-header">Feature Gifs</h2>
@@ -87,16 +80,13 @@
       <section id="profile" style="display: none">
         <header class="profile-header">
           <img
-            src="profile-avatar.png"
+            src="assets/profile-avatar.png"
             alt="User Avatar"
             class="profile-avatar"
           />
           <div class="profile-info">
-            <!-- Username (set dynamically when logged in) -->
             <h2 id="welcomeMessage"></h2>
-            <!-- Handle (set dynamically when logged in) -->
             <p id="profileHandle"></p>
-            <!-- Optional tagline or email -->
             <p id="profileTagline"></p>
             <p id="profileEmail"></p>
           </div>
@@ -105,7 +95,6 @@
         <h3 class="profile-subheader">Profile Dashboard</h3>
         <p id="profileDashboardText">Manage your account and explore GIFs.</p>
 
-        <!-- Profile search gallery (replace existing #profileSearchResults) -->
         <div id="profileSearchResults">
           <h2 class="feature-header" id="profileFeatureHeader">Profile GIFs</h2>
 
@@ -118,10 +107,8 @@
               <p class="loading-text">Loading...</p>
             </div>
 
-            <!-- Grid container (same role as #gifResults) -->
             <div id="profileGifResults"></div>
 
-            <!-- Separate Load More button (same style as homepage) -->
             <button
               id="profileLoadMoreBtn"
               class="btn-load-more"
@@ -133,7 +120,6 @@
         </div>
       </section>
 
-      <!-- Favorites Page -->
       <section id="favorites" style="display: none">
         <h2 class="feature-header" id="favoritesHeader">My Favorites</h2>
 
@@ -146,10 +132,8 @@
             <p class="loading-text">Loading Favorites...</p>
           </div>
 
-          <!-- Grid container (same role as #gifResults / #profileGifResults) -->
           <div id="favoritesGrid"></div>
 
-          <!-- Separate Load More button -->
           <button
             id="favoritesLoadMoreBtn"
             class="btn-load-more"
@@ -176,14 +160,12 @@
           Log in or sign up to save your funniest finds
         </p>
 
-        <!-- Tabs -->
         <div class="modal-tabs">
           <button id="loginTab" class="active">Login</button>
           <button id="signupTab">Signup</button>
         </div>
 
-        <!-- Login Form -->
-        <form id="loginForm" class="auth-form">
+        <form id="loginForm" class="auth-form" novalidate>
           <input
             type="text"
             id="loginUsername"
@@ -201,17 +183,15 @@
             autocomplete="off"
             required
           />
-
-          <label class="remember-me">
-            <input type="checkbox" id="rememberMe" /><span>
-              Remember Me
-            </span></label
+          <label class="remember-me"
+            ><input type="checkbox" id="rememberMe" /><span
+              >Remember Me</span
+            ></label
           >
           <button type="submit" class="btn-login">Login</button>
         </form>
 
-        <!-- Signup form -->
-        <form id="signupForm" class="auth-form hidden">
+        <form id="signupForm" class="auth-form hidden" novalidate>
           <input
             type="text"
             id="signupUsername"
@@ -246,16 +226,12 @@
         </form>
       </div>
     </div>
-    <!-- Core logic first -->
-    <script src="js/api.js"></script>
-    <!-- Fetching data only -->
-    <script src="js/favorites.js"></script>
-    <!-- Favorites management -->
-    <script src="js/ui.js"></script>
-    <!-- Rendering GIFs + error messages -->
-    <script src="js/auth.js"></script>
-    <!-- Authentication + UI state -->
-    <script src="js/main.js"></script>
-    <!-- Entry point + event listeners -->
+
+    <!-- Scripts: ui first, then api, main, favorites, auth. Use defer so DOM is ready. -->
+    <script src="js/ui.js" defer></script>
+    <script src="js/api.js" defer></script>
+    <script src="js/main.js" defer></script>
+    <script src="js/favorites.js" defer></script>
+    <script src="js/auth.js" defer></script>
   </body>
 </html>

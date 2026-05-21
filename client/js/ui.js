@@ -191,3 +191,51 @@ async function displayProfileSearchResults(gifs, favorites, query = "") {
     });
   }
 }
+
+// Hide all sections first
+function hideAllSections() {
+  const feature = document.getElementById("feature-section");
+  const profile = document.getElementById("profile");
+  const favorites = document.getElementById("favorites");
+  if (feature) feature.style.display = "none";
+  if (profile) profile.style.display = "none";
+  if (favorites) favorites.style.display = "none";
+
+  // Clear containers to avoid overlap
+  const profileGrid = document.getElementById("profileGifResults");
+  if (profileGrid) profileGrid.innerHTML = "";
+  const favoritesGrid = document.getElementById("favoritesGrid");
+  if (favoritesGrid) favoritesGrid.innerHTML = "";
+}
+
+// Show Profile page
+function showProfilePage() {
+  hideAllSections();
+
+  const profileSection = document.getElementById("profile");
+  if (profileSection) profileSection.style.display = "block";
+
+  // Reset profile search state
+  window.profileSearchState = { query: "", offset: 0, limit: 20 };
+
+  // Update UI header/info
+  updateUI();
+}
+
+// Show Favorites page
+function showFavoritesPage() {
+  hideAllSections();
+
+  const favoritesSection = document.getElementById("favorites");
+  if (favoritesSection) favoritesSection.style.display = "block";
+
+  // Render favorites grid
+  if (typeof displayFavorites === "function") {
+    displayFavorites("favoritesGrid", true);
+  }
+}
+
+// Expose globally so HTML onclick works
+window.showProfilePage = showProfilePage;
+window.showFavoritesPage = showFavoritesPage;
+window.hideAllSections = hideAllSections;
