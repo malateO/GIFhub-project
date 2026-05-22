@@ -186,12 +186,6 @@ loadMoreBtn.addEventListener("click", async () => {
   }
 });
 
-function hideAllSections() {
-  document.getElementById("feature-section").style.display = "none";
-  document.getElementById("profile").style.display = "none";
-  document.getElementById("favorites").style.display = "none";
-}
-
 // Initial load of trending GIFs
 fetchGifs("").then(async (data) => {
   const favorites = await getFavorites(); // ✅ fetch backend favorites

@@ -72,6 +72,9 @@ function logout() {
   lastDisplayedGifs = [];
   infiniteScrollEnabled = false;
 
+  // Hide all sections including favorites
+  hideAllSections();
+
   // ✅ Clear suggestion dropdown
   const suggestionsContainer = document.getElementById("searchSuggestions");
   if (suggestionsContainer) suggestionsContainer.innerHTML = "";
