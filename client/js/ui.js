@@ -197,6 +197,7 @@ function hideAllSections() {
   const feature = document.getElementById("feature-section");
   const profile = document.getElementById("profile");
   const favorites = document.getElementById("favorites");
+
   if (feature) feature.style.display = "none";
   if (profile) profile.style.display = "none";
   if (favorites) favorites.style.display = "none";
