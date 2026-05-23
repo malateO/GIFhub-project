@@ -18,8 +18,12 @@ const authPopup = document.getElementById("auth-popup");
 
 async function loadMoreGifs(query) {
   try {
-    const data = await fetchGifs(query); // ✅ fetch GIFs
-    const favorites = await getFavorites(); // ✅ fetch backend favorites
+    const data = await fetchGifs(query);
+    let favorites = [];
+    if (userProfile) {
+      // ✅ only fetch favorites if logged in
+      favorites = await getFavorites();
+    }
     displayGifs([...lastDisplayedGifs, ...data.data], favorites);
   } catch (error) {
     console.error("GIF fetch failed", error);
@@ -188,37 +192,29 @@ loadMoreBtn.addEventListener("click", async () => {
 
 // Initial load of trending GIFs
 fetchGifs("").then(async (data) => {
-  const favorites = await getFavorites(); // ✅ fetch backend favorites
-  displayGifs(data.data, favorites, false, ""); // ✅ pass favorites in
+  let favorites = [];
+  if (userProfile) {
+    // ✅ only if logged in
+    favorites = await getFavorites();
+  }
+  displayGifs(data.data, favorites, false, "");
 });
 
 // Search form submit handler
 searchForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // Clear suggestions immediately
   if (suggestionsContainer) suggestionsContainer.innerHTML = "";
   searchBar.blur();
 
   currentSearchQuery = searchBar.value.trim();
-  const resultsContainer = document.getElementById("profileSearchResults");
-
-  // Empty query → reset homepage
-  if (!currentSearchQuery) {
-    if (resultsContainer) {
-      resultsContainer.style.display = "none";
-      resultsContainer.classList.remove("active");
-      const profileGrid = document.getElementById("profileGifResults");
-      if (profileGrid) profileGrid.innerHTML = "";
-    }
-    const data = await fetchGifs("");
-    const favorites = await getFavorites(); // ✅ fetch backend favorites
-    displayGifs(data.data, favorites, false, "");
-    return;
-  }
-
   const data = await fetchGifs(currentSearchQuery);
-  const favorites = await getFavorites();
+
+  // ✅ Only fetch favorites if logged in
+  let favorites = [];
+  if (userProfile) {
+    favorites = await getFavorites();
+  }
 
   if (userProfile && userProfile.username) {
     // logged in → profile search
@@ -227,7 +223,7 @@ searchForm.addEventListener("submit", async (e) => {
 
     if (profileGallery) {
       profileGallery.style.display = "block";
-      displayProfileSearchResults(data.data, favorites, currentSearchQuery); // ✅ pass favorites in
+      displayProfileSearchResults(data.data, favorites, currentSearchQuery);
     }
 
     if (resultsContainer) {
@@ -236,8 +232,6 @@ searchForm.addEventListener("submit", async (e) => {
     }
   } else {
     // logged out → homepage search
-    userProfile = null;
-    localStorage.clear();
     const featureSection = document.getElementById("feature-section");
     if (featureSection) featureSection.style.display = "block";
     displayGifs(data.data, favorites, true, currentSearchQuery);

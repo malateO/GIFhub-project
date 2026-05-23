@@ -1,11 +1,27 @@
 async function getFavorites() {
   const token = localStorage.getItem("token");
-  if (!token) return [];
-  const res = await fetch("http://localhost:5000/api/favorites", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  const data = await res.json();
-  return data.favorites || [];
+  if (!token || !userProfile) {
+    return []; // ✅ return empty array if logged out
+  }
+
+  try {
+    const res = await fetch("http://localhost:5000/api/favorites", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) {
+      if (res.status === 401 || res.status === 403) {
+        localStorage.removeItem("token");
+        userProfile = null;
+        updateUI();
+      }
+      return [];
+    }
+    const data = await res.json();
+    return data.favorites || [];
+  } catch (err) {
+    console.error("getFavorites error", err);
+    return [];
+  }
 }
 
 function displayGifs(gifs, favorites, isSearch = false, query = "") {

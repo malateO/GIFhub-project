@@ -46,16 +46,24 @@ router.post("/signup", async (req, res) => {
 // POST /api/login
 router.post("/login", async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { identifier, password } = req.body;
 
-    const user = await User.findOne(username ? { username } : { email });
+    // Decide whether identifier is email or username
+    const query = identifier.includes("@")
+      ? { email: identifier }
+      : { username: identifier };
+
+    if (!identifier || !password) {
+      return res.status(400).json({ error: "Missing credentials" });
+    }
+
+    const user = await User.findOne(query);
     if (!user) return res.status(400).json({ error: "User not found" });
 
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword)
       return res.status(400).json({ error: "Invalid Password" });
 
-    // Generate JWT token
     const token = jwt.sign(
       { id: user._id, username: user.username, email: user.email },
       process.env.JWT_SECRET,
@@ -77,7 +85,15 @@ router.get("/me", async (req, res) => {
     }
 
     const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET,
+      (err, decoded) => {
+        if (err)
+          return res.status(401).json({ error: "Invalid or expired token" });
+        return decoded;
+      },
+    );
 
     const user = await User.findById(decoded.id);
     if (!user) {
