@@ -38,23 +38,20 @@ async function login(identifier, password) {
     const res = await fetch("http://localhost:5000/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: identifier,
-        email: identifier,
-        password,
-      }),
+      body: JSON.stringify({ identifier, password }),
     });
+
     const data = await res.json();
 
     if (res.ok) {
-      // ✅ Save JWT only
       localStorage.setItem("token", data.token);
-
-      // ✅ Backend must return username + email, or decode from JWT
       userProfile = { username: data.username, email: data.email };
-
       updateUI();
       closeModal();
+
+      // ✅ clear inputs only after success
+      document.getElementById("loginUsername").value = "";
+      document.getElementById("loginPassword").value = "";
     } else {
       alert(data.error || "Login failed");
     }
@@ -72,21 +69,26 @@ function logout() {
   lastDisplayedGifs = [];
   infiniteScrollEnabled = false;
 
-  // Hide all sections including favorites
   hideAllSections();
 
-  // ✅ Clear suggestion dropdown
   const suggestionsContainer = document.getElementById("searchSuggestions");
   if (suggestionsContainer) suggestionsContainer.innerHTML = "";
 
   updateUI();
 
-  fetchGifs("").then(async (data) => {
-    const favorites = await getFavorites();
-    displayGifs(data.data, favorites, false, "");
+  // ✅ don’t call getFavorites after logout
+  fetchGifs("").then((data) => {
+    displayGifs(data.data, [], false, "");
   });
 
   closeModal();
+
+  authPopup.classList.remove("show"); // ✅ redundant safety
+  authPopup.style.visibility = "hidden"; // ✅ redundant safety
+  // ✅ reset dropdown state so no modal auto‑opens
+  authIcon.classList.remove("open");
+  // ✅ temporarily disable click handler until user interacts again
+  authIcon.removeEventListener("click", mobileAuthClickHandler);
 }
 
 async function createAccount(username, password, email) {
@@ -124,6 +126,8 @@ function updateUI() {
   if (userProfile) {
     // logged in → show profile dashboard
     // reset profile search state and hide profile gallery content
+    // logged out → guest mode
+    authIcon.addEventListener("click", mobileAuthClickHandler);
     profileSearchState = { query: "", offset: 0, limit: 20 };
     const profileGrid = document.getElementById("profileGifResults");
     if (profileGrid) profileGrid.innerHTML = "";
@@ -172,10 +176,10 @@ function updateUI() {
 
 function mobileAuthClickHandler() {
   if (userProfile) {
-    // Logged in → toggle dropdown class only
+    // Logged in → toggle dropdown
     authIcon.classList.toggle("open");
   } else {
-    // Logged out → open modal
+    // Logged out → open modal when user clicks the icon
     openModal();
   }
 }
@@ -218,10 +222,7 @@ function openModal() {
 //Close Modal
 function closeModal() {
   authPopup.classList.remove("show");
-
-  setTimeout(() => {
-    authPopup.style.visibility = "hidden";
-  });
+  authPopup.style.visibility = "hidden"; // ✅ force hidden
 }
 
 // ===== Tab Switching ======
@@ -242,8 +243,20 @@ signupTab.addEventListener("click", () => {
 // login handler
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
+
+  // ✅ Only run if modal is visible
+  if (!authPopup.classList.contains("show")) {
+    return; // do nothing if modal is closed
+  }
+
   const identifier = document.getElementById("loginUsername").value;
   const password = document.getElementById("loginPassword").value;
+
+  // ✅ Frontend validation
+  if (!identifier || !password) {
+    alert("Please enter both username/email and password");
+    return;
+  }
 
   login(identifier, password);
 
@@ -251,12 +264,13 @@ loginForm.addEventListener("submit", (e) => {
   document.getElementById("loginPassword").value = "";
 
   if (document.getElementById("rememberMe").checked) {
-    localStorage.setItem("savedAccount", username);
+    localStorage.setItem("savedAccount", identifier);
   }
 
   const savedAccount = localStorage.getItem("savedAccount");
   if (savedAccount) {
-    document.getElementById("loginUsername").value = savedAccount;
+    const clean = savedAccount.trim();
+    document.getElementById("loginUsername").value = clean;
   }
 });
 
