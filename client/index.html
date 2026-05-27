@@ -13,24 +13,39 @@
   <body>
     <nav class="navbar">
       <div class="navdiv">
+        <!-- Left: Logo -->
         <div class="navlogo"><a href="#">GifHub</a></div>
-        <ul>
-          <li class="navlist"><a href="#">Forum</a></li>
-          <li class="navlist"><a href="#">About</a></li>
-        </ul>
-        <div class="auth-icon" id="authIcon">
-          <span class="material-symbols-outlined" id="guestIcon"
-            >account_circle</span
-          >
-          <span id="loginStatus" class="login-status">Guest</span>
 
-          <div class="profile-dropdown" id="profileDropdown">
-            <ul>
-              <li><a href="#" onclick="showProfilePage()">Profile</a></li>
-              <li><a href="#" onclick="showFavoritesPage()">Favorites</a></li>
-              <hr class="dropdown-divider" />
-              <li><a href="#" onclick="logout()">Logout</a></li>
-            </ul>
+        <!-- Center: Desktop links -->
+        <ul class="nav-links">
+          <li class="navlist desktop-only"><a href="#">Forum</a></li>
+          <li class="navlist desktop-only"><a href="#">About</a></li>
+        </ul>
+
+        <!-- Right: Mobile icons + Auth -->
+        <div class="nav-right">
+          <div class="mobile-icons">
+            <span class="material-symbols-outlined mobile-only" title="Forum"
+              >forum</span
+            >
+            <span class="material-symbols-outlined mobile-only" title="About"
+              >info</span
+            >
+          </div>
+
+          <div class="auth-icon" id="authIcon">
+            <span class="material-symbols-outlined" id="guestIcon"
+              >account_circle</span
+            >
+            <span id="loginStatus" class="login-status">Guest</span>
+            <div class="profile-dropdown" id="profileDropdown">
+              <ul>
+                <li><a href="#" onclick="showProfilePage()">Profile</a></li>
+                <li><a href="#" onclick="showFavoritesPage()">Favorites</a></li>
+                <hr class="dropdown-divider" />
+                <li><a href="#" onclick="logout()">Logout</a></li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
