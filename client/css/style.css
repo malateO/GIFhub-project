@@ -22,6 +22,21 @@ body {
   justify-content: space-between;
 }
 
+/* Center desktop links */
+.nav-links {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+}
+
+/* Right side group */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .navdiv ul {
   display: flex;
   gap: 25px;
@@ -989,5 +1004,59 @@ main,
   }
   #gifResults {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}
+
+/* Mobile icons */
+.mobile-icons {
+  display: none; /* hidden on desktop */
+  align-items: center;
+  gap: 10px;
+}
+
+.mobile-icons .material-symbols-outlined {
+  font-size: 22px;
+  color: #6a0dad;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.mobile-icons .material-symbols-outlined:hover {
+  transform: scale(1.2);
+}
+
+/* Responsive switch */
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+  .mobile-icons {
+    display: flex;
+  }
+}
+
+/* Default: desktop shows text links, hides icons */
+.desktop-only {
+  display: inline-block;
+}
+.mobile-only {
+  display: none !important; /* always hidden on desktop */
+}
+
+/* Mobile view: hide text links, show icons beside login */
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important; /* force hide text links */
+  }
+  .mobile-only {
+    display: inline-block !important; /* force show icons */
+    font-size: 22px;
+    color: #6a0dad;
+    margin-right: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  .mobile-only:hover {
+    transform: scale(1.2);
   }
 }
