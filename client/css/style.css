@@ -1060,3 +1060,47 @@ main,
     transform: scale(1.2);
   }
 }
+
+.toast {
+  visibility: hidden;
+  min-width: 280px;
+  background: rgba(106, 13, 173, 0.55); /* semi-transparent purple */
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  text-align: center;
+  border-radius: 12px;
+  padding: 14px 20px;
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+
+  /* Glass effect */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  opacity: 0;
+  transition:
+    opacity 0.5s ease,
+    visibility 0.5s ease,
+    transform 0.3s ease;
+}
+
+.toast.show {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) translateY(-10px); /* slight lift */
+}
+
+.toast-icon {
+  font-size: 18px;
+  color: #fff;
+}

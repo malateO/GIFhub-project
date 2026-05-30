@@ -89,6 +89,10 @@ function logout() {
   authIcon.classList.remove("open");
   // ✅ temporarily disable click handler until user interacts again
   authIcon.removeEventListener("click", mobileAuthClickHandler);
+  enableMobileDropdown();
+
+  // ✅ Show guest mode toast
+  showToast("You are now browsing as Guest");
 }
 
 async function createAccount(username, password, email) {
@@ -190,7 +194,10 @@ function enableMobileDropdown() {
 
   // Always allow click when logged out (to open modal)
   if (!userProfile) {
-    authIcon.addEventListener("click", mobileAuthClickHandler);
+    setTimeout(() => {
+      authIcon.addEventListener("click", mobileAuthClickHandler);
+    }, 0);
+
     return;
   }
 
@@ -273,6 +280,24 @@ loginForm.addEventListener("submit", (e) => {
     document.getElementById("loginUsername").value = clean;
   }
 });
+
+function showToast(message, icon = "person") {
+  const toast = document.getElementById("toast");
+  const toastMessage = document.getElementById("toastMessage");
+  const toastIcon = toast.querySelector(".toast-icon");
+
+  if (!toast || !toastMessage || !toastIcon) return;
+
+  toastMessage.textContent = message;
+  toastIcon.textContent = icon; // material symbol name
+
+  toast.classList.add("show");
+
+  // Hide after 3 seconds
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3000);
+}
 
 // signup Handler
 signupForm.addEventListener("submit", (e) => {
