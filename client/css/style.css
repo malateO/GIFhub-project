@@ -324,23 +324,6 @@ body {
   scrollbar-color: #6a0dad #1a0b1f;
 }
 
-.gif-item,
-.profile-gif {
-  width: 100%;
-  max-width: 200px; /* keeps them neat */
-  border-radius: 12px;
-  overflow: hidden;
-  background: #f9f0ff; /* playful purple card background */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.gif-item img,
-.profile-gif img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
 .btn-load-more {
   display: block;
   margin: 20px auto;
@@ -391,16 +374,6 @@ body {
   background: #1a0b1f; /* same purple background */
 }
 
-/* Grid container for profile results (same layout as #gifResults) */
-#profileGifResults {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
-  padding: 10px;
-  grid-auto-flow: dense;
-  align-items: start;
-}
-
 /* Keep scrollbar styling consistent */
 #profileGifGallery::-webkit-scrollbar {
   width: 8px;
@@ -426,21 +399,6 @@ body {
   box-sizing: border-box;
 }
 
-/* Canonical grid rule applied to grid containers only */
-#gifResults,
-#profileGifResults,
-#favoritesGrid,
-#profileFavorites {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
-  padding: 10px;
-  grid-auto-flow: dense;
-  align-items: start;
-  width: 100%;
-  box-sizing: border-box;
-}
-
 /* Unified gallery layout for homepage and profile */
 #gifGallery,
 #profileGifGallery {
@@ -451,63 +409,6 @@ body {
   border-radius: 8px;
   background: #1a0b1f;
   box-sizing: border-box;
-}
-
-/* Wrapper for profile search results should be a block, not a grid */
-
-/* Canonical grid rule applied to both containers */
-#gifResults,
-#profileGifResults {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
-  padding: 10px;
-  grid-auto-flow: dense;
-  align-items: start;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* Shared grid item sizing */
-.gif-item,
-.profile-gif {
-  width: 100%;
-  max-width: 220px;
-  box-sizing: border-box;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #f9f0ff;
-  position: relative;
-}
-
-.gif-item {
-  width: 100%;
-  max-width: none; /* let the grid control sizing */
-  border-radius: 12px;
-  overflow: hidden;
-  box-sizing: border-box;
-}
-
-.gif-item img {
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.gif-item img:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* Grid children (Gallery + Favorites + Profile) */
-.gif-item,
-.profile-gif {
-  width: 100%;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #f9f0ff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  position: relative; /* needed for heart button positioning */
 }
 
 /* Loading spinner */
@@ -825,12 +726,6 @@ body {
   color: #4a004a;
 }
 
-#profileFavorites {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 15px;
-}
-
 /* Profile Header */
 .profile-header {
   display: flex;
@@ -892,7 +787,6 @@ body {
 
 #gifResults h2,
 #profileSearchResults h2 {
-  grid-column: 1 / -1;
   text-align: center;
   margin-bottom: 15px;
   color: #6a0dad;
@@ -910,29 +804,52 @@ main {
   box-sizing: border-box;
 }
 
+/* Masonry containers */
+#gifResults,
+#profileGifResults,
+#favoritesGrid,
+#profileFavorites {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative; /* Masonry needs this */
+  margin: 0 auto; /* center container */
+  padding: 0; /* remove side padding */
+}
+
+/* Masonry items */
+.gif-item,
+.profile-gif {
+  width: 200px; /* desktop default */
+  margin: 10px; /* spacing between items */
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f9f0ff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.gif-item img,
+.profile-gif img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.gif-item img:hover,
+.profile-gif img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
 /* Profile section and gallery should expand like homepage */
 #profile,
 #profileSearchResults,
 #profileGifGallery {
   width: 100%;
   max-width: 100%;
-  box-sizing: border-box;
-}
-
-/* Profile grid matches homepage grid */
-#profileGifResults {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
-  padding: 10px;
-  align-items: start;
-}
-
-/* Grid items stay compact */
-#profileGifResults .gif-item {
-  grid-column: auto;
-  width: 100%;
-  max-width: 220px;
   box-sizing: border-box;
 }
 
@@ -971,23 +888,6 @@ main {
   background: #1a0b1f; /* ✅ keep purple only here */
 }
 
-#favoritesGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
-  padding: 10px;
-  grid-auto-flow: dense;
-  align-items: start;
-}
-
-#favoritesGrid .gif-item {
-  border-radius: 12px;
-  overflow: hidden;
-  background: #f9f0ff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  position: relative;
-}
-
 html,
 body,
 main,
@@ -1001,9 +901,6 @@ main,
   .popup-content {
     width: 90%;
     padding: 20px;
-  }
-  #gifResults {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
 }
 
@@ -1026,12 +923,42 @@ main,
 }
 
 /* Responsive switch */
+@media (max-width: 1024px) {
+  .gif-item,
+  .profile-gif {
+    width: 180px;
+  }
+}
+
 @media (max-width: 768px) {
   .desktop-only {
     display: none !important;
   }
   .mobile-icons {
     display: flex;
+  }
+  .gif-item,
+  .profile-gif {
+    width: 150px; /* shrink for tablets */
+  }
+  .mobile-only {
+    display: inline-block !important; /* force show icons */
+    font-size: 22px;
+    color: #6a0dad;
+    margin-right: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  .mobile-only:hover {
+    transform: scale(1.2);
+  }
+}
+
+@media (max-width: 480px) {
+  .gif-item,
+  .profile-gif {
+    width: 100%; /* single column on phones */
+    margin: 0 0 15px 0; /* only bottom spacing */
   }
 }
 
