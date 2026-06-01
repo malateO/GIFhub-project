@@ -129,7 +129,6 @@ async function displayFavorites(containerId, reset = true) {
     if (typeof Masonry !== "undefined" && masonryTarget) {
       const existing = Masonry.data(masonryTarget);
       if (existing) existing.destroy();
-
       new Masonry(masonryTarget, {
         itemSelector: ".gif-item",
         gutter: 15,

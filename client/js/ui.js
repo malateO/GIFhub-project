@@ -86,11 +86,16 @@ function displayGifs(gifs, favorites, isSearch = false, query = "") {
 
   // Masonry refresh if used
   if (typeof Masonry !== "undefined") {
-    new Masonry(resultContainer, {
-      itemSelector: ".gif-item",
-      gutter: 15,
-      fitWidth: true,
-    });
+    const masonryTarget = document.getElementById("gifResults");
+    if (masonryTarget) {
+      const existing = Masonry.data(masonryTarget);
+      if (existing) existing.destroy(); // reset old layout
+      new Masonry(masonryTarget, {
+        itemSelector: ".gif-item",
+        gutter: 15,
+        fitWidth: true,
+      });
+    }
   }
 }
 
@@ -109,6 +114,7 @@ async function displayProfileSearchResults(gifs, favorites, query = "") {
   const grid = document.getElementById("profileGifResults");
   const loadMoreBtn = document.getElementById("profileLoadMoreBtn");
   const spinner = document.getElementById("profileLoadingSpinner");
+  const masonryTarget = document.getElementById("profileGifResults");
 
   if (!grid) return;
 
@@ -198,8 +204,9 @@ async function displayProfileSearchResults(gifs, favorites, query = "") {
   };
 
   // Masonry refresh if used
-  const masonryTarget = document.getElementById("profileGifResults");
   if (typeof Masonry !== "undefined" && masonryTarget) {
+    const existing = Masonry.data(masonryTarget);
+    if (existing) existing.destroy();
     new Masonry(masonryTarget, {
       itemSelector: ".gif-item",
       gutter: 15,
