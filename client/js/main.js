@@ -237,3 +237,9 @@ searchForm.addEventListener("submit", async (e) => {
     displayGifs(data.data, favorites, true, currentSearchQuery);
   }
 });
+
+window.addEventListener("resize", () => {
+  initMasonry("gifResults");
+  initMasonry("profileGifResults");
+  initMasonry("favoritesGrid");
+});
