@@ -1,3 +1,26 @@
+function initMasonry(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container || typeof Masonry === "undefined") return;
+
+  const existing = Masonry.data(container);
+  if (existing) existing.destroy();
+
+  const msnry = new Masonry(container, {
+    itemSelector: ".gif-item",
+    gutter: 8, // ✅ consistent spacing between items
+    fitWidth: false, // ✅ fill container width
+  });
+
+  // ✅ Wait for images to load before layout
+  if (typeof imagesLoaded !== "undefined") {
+    imagesLoaded(container, () => {
+      msnry.layout();
+    });
+  }
+
+  return msnry;
+}
+
 async function getFavorites() {
   const token = localStorage.getItem("token");
   if (!token || !userProfile) {
@@ -85,18 +108,7 @@ function displayGifs(gifs, favorites, isSearch = false, query = "") {
   });
 
   // Masonry refresh if used
-  if (typeof Masonry !== "undefined") {
-    const masonryTarget = document.getElementById("gifResults");
-    if (masonryTarget) {
-      const existing = Masonry.data(masonryTarget);
-      if (existing) existing.destroy(); // reset old layout
-      new Masonry(masonryTarget, {
-        itemSelector: ".gif-item",
-        gutter: 15,
-        fitWidth: true,
-      });
-    }
-  }
+  initMasonry("gifResults");
 }
 
 async function displayProfileSearchResults(gifs, favorites, query = "") {
@@ -204,15 +216,7 @@ async function displayProfileSearchResults(gifs, favorites, query = "") {
   };
 
   // Masonry refresh if used
-  if (typeof Masonry !== "undefined" && masonryTarget) {
-    const existing = Masonry.data(masonryTarget);
-    if (existing) existing.destroy();
-    new Masonry(masonryTarget, {
-      itemSelector: ".gif-item",
-      gutter: 15,
-      fitWidth: true,
-    });
-  }
+  initMasonry("profileGifResults");
 }
 
 // Hide all sections first
