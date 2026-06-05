@@ -240,10 +240,22 @@ function hideAllSections() {
 function showProfilePage() {
   hideAllSections();
 
+  // ✅ Show dashboard elements again when entering Profile
+  const profileHeader = document.querySelector(".profile-header");
+  const profileDashboardText = document.getElementById("profileDashboardText");
+  const profileSubheader = document.querySelector(".profile-subheader");
+  if (profileHeader) profileHeader.style.display = "flex";
+  if (profileDashboardText) profileDashboardText.style.display = "block";
+  if (profileSubheader) profileSubheader.style.display = "block";
+
   const profileSection = document.getElementById("profile");
   if (profileSection) profileSection.style.display = "block";
 
-  // Reset profile search state
+  // ✅ Hide results box until a search is made
+  const resultsContainer = document.getElementById("profileSearchResults");
+  if (resultsContainer) resultsContainer.style.display = "none";
+
+  // ✅ Reset profile search state
   window.profileSearchState = { query: "", offset: 0, limit: 20 };
 
   // Update UI header/info

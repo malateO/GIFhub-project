@@ -52,6 +52,8 @@ async function login(identifier, password) {
       // ✅ clear inputs only after success
       document.getElementById("loginUsername").value = "";
       document.getElementById("loginPassword").value = "";
+      searchBar.value = "";
+      currentSearchQuery = "";
     } else {
       alert(data.error || "Login failed");
     }
