@@ -40,7 +40,13 @@ async function toggleFavorite(gif) {
 
   // Refresh whichever view is active
   if (document.getElementById("favorites").style.display === "block") {
-    displayFavorites("favoritesGrid", true);
+    if (favoritesSearchActive) {
+      // ✅ Stay in Favorites search mode
+      displayFavoritesSearch(currentSearchQuery);
+    } else {
+      // Normal Favorites page
+      displayFavorites("favoritesGrid", true);
+    }
   } else if (document.getElementById("profile").style.display === "block") {
     displayProfileSearchResults(
       lastDisplayedGifs,

@@ -1,6 +1,7 @@
 let lastDisplayedGifs = [];
 let infiniteScrollEnabled = false;
 let currentSearchQuery = "";
+let favoritesSearchActive = false;
 
 const gifGallery = document.getElementById("gifGallery");
 const searchBar = document.getElementById("searchBar");
@@ -110,7 +111,27 @@ searchBar.addEventListener(
     if (!suggestionsContainer) return;
     suggestionsContainer.innerHTML = "";
 
-    if (!query) return;
+    if (!query) {
+      favoritesSearchActive = false; // ✅ reset when query is cleared
+      // ✅ Restore Profile dashboard when search is cleared
+      if (userProfile && userProfile.username) {
+        const profileHeader = document.querySelector(".profile-header");
+        const profileDashboardText = document.getElementById(
+          "profileDashboardText",
+        );
+        const profileSubheader = document.querySelector(".profile-subheader");
+        const resultsContainer = document.getElementById(
+          "profileSearchResults",
+        );
+
+        if (profileHeader) profileHeader.style.display = "flex";
+        if (profileDashboardText) profileDashboardText.style.display = "block";
+        if (profileSubheader) profileSubheader.style.display = "block";
+        if (resultsContainer) resultsContainer.style.display = "none";
+      }
+
+      return; // stop here, don’t fetch suggestions
+    }
 
     try {
       const suggestions = await fetchSuggestions(query);
@@ -202,7 +223,55 @@ fetchGifs("").then(async (data) => {
 
 // Search form submit handler
 searchForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+  if (document.getElementById("favorites").style.display === "block") {
+    e.preventDefault();
+    if (suggestionsContainer) suggestionsContainer.innerHTML = "";
+    searchBar.blur();
+
+    currentSearchQuery = searchBar.value.trim();
+    favoritesSearchActive = true; // ✅ mark that we’re in Favorites search mode
+    const data = await fetchGifs(currentSearchQuery);
+
+    // ✅ Only fetch favorites if logged in
+    let favorites = [];
+    if (userProfile) {
+      favorites = await getFavorites();
+    }
+
+    // ✅ Show search results inside Favorites grid
+    const favoritesGrid = document.getElementById("favoritesGrid");
+    if (favoritesGrid) {
+      favoritesGrid.innerHTML = ""; // clear old favorites
+      data.data.forEach((gif) => {
+        const gifWrapper = document.createElement("div");
+        gifWrapper.className = "gif-item";
+
+        const img = document.createElement("img");
+        img.src =
+          gif.images?.fixed_height?.url ||
+          gif.images?.downsized?.url ||
+          gif.images?.original?.url;
+        img.alt = gif.title || "GIF";
+
+        // Favorite button
+        if (userProfile) {
+          const favButton = document.createElement("button");
+          favButton.className = "fav-btn";
+          const isFavorited = favorites.some((fav) => fav.id === gif.id);
+          favButton.textContent = isFavorited ? "❤️" : "🤍";
+          if (isFavorited) favButton.classList.add("active");
+          favButton.addEventListener("click", () => toggleFavorite(gif));
+          gifWrapper.appendChild(favButton);
+        }
+
+        gifWrapper.appendChild(img);
+        favoritesGrid.appendChild(gifWrapper);
+      });
+
+      initMasonry("favoritesGrid");
+    }
+    return;
+  }
 
   if (suggestionsContainer) suggestionsContainer.innerHTML = "";
   searchBar.blur();
@@ -217,9 +286,18 @@ searchForm.addEventListener("submit", async (e) => {
   }
 
   if (userProfile && userProfile.username) {
-    // logged in → profile search
     const profileGallery = document.getElementById("profileGifGallery");
     const resultsContainer = document.getElementById("profileSearchResults");
+
+    // ✅ Hide dashboard elements when searching
+    const profileHeader = document.querySelector(".profile-header");
+    const profileDashboardText = document.getElementById(
+      "profileDashboardText",
+    );
+    const profileSubheader = document.querySelector(".profile-subheader");
+    if (profileHeader) profileHeader.style.display = "none";
+    if (profileDashboardText) profileDashboardText.style.display = "none";
+    if (profileSubheader) profileSubheader.style.display = "none";
 
     if (profileGallery) {
       profileGallery.style.display = "block";
@@ -227,8 +305,12 @@ searchForm.addEventListener("submit", async (e) => {
     }
 
     if (resultsContainer) {
-      resultsContainer.style.display = "block";
-      resultsContainer.classList.add("active");
+      if (data.data && data.data.length > 0) {
+        resultsContainer.style.display = "block";
+        resultsContainer.classList.add("active");
+      } else {
+        resultsContainer.style.display = "none";
+      }
     }
   } else {
     // logged out → homepage search
@@ -237,6 +319,45 @@ searchForm.addEventListener("submit", async (e) => {
     displayGifs(data.data, favorites, true, currentSearchQuery);
   }
 });
+
+async function displayFavoritesSearch(query) {
+  const data = await fetchGifs(query);
+  let favorites = [];
+  if (userProfile) {
+    favorites = await getFavorites();
+  }
+
+  const favoritesGrid = document.getElementById("favoritesGrid");
+  if (favoritesGrid) {
+    favoritesGrid.innerHTML = "";
+    data.data.forEach((gif) => {
+      const gifWrapper = document.createElement("div");
+      gifWrapper.className = "gif-item";
+
+      const img = document.createElement("img");
+      img.src =
+        gif.images?.fixed_height?.url ||
+        gif.images?.downsized?.url ||
+        gif.images?.original?.url;
+      img.alt = gif.title || "GIF";
+
+      if (userProfile) {
+        const favButton = document.createElement("button");
+        favButton.className = "fav-btn";
+        const isFavorited = favorites.some((fav) => fav.id === gif.id);
+        favButton.textContent = isFavorited ? "❤️" : "🤍";
+        if (isFavorited) favButton.classList.add("active");
+        favButton.addEventListener("click", () => toggleFavorite(gif));
+        gifWrapper.appendChild(favButton);
+      }
+
+      gifWrapper.appendChild(img);
+      favoritesGrid.appendChild(gifWrapper);
+    });
+
+    initMasonry("favoritesGrid");
+  }
+}
 
 window.addEventListener("resize", () => {
   initMasonry("gifResults");
