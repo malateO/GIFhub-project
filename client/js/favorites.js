@@ -4,22 +4,20 @@ let favoritesState = {
 };
 
 async function toggleFavorite(gif) {
-  // Prevent favoriting if not logged in
   if (!userProfile) {
     alert("Please log in to save Favorites!");
     return;
   }
 
-  // Get current favorites from backend
   const favorites = await getFavorites();
   const isFavorited = favorites.some((fav) => fav.id === gif.id);
 
-  // Add or remove favorite
   if (isFavorited) {
     await fetch(`http://localhost:5000/api/favorites/${gif.id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
+    showToast("Removed from Favorites", "cancel"); // ❌ icon for remove
   } else {
     await fetch("http://localhost:5000/api/favorites", {
       method: "POST",
@@ -30,21 +28,19 @@ async function toggleFavorite(gif) {
       body: JSON.stringify({
         gifId: gif.id,
         title: gif.title,
-        images: gif.images, // ✅ send full images object
+        images: gif.images,
       }),
     });
+    showToast("Added to Favorites", "favorite"); // ❤️ icon for add
   }
 
-  // ✅ Refresh favorites after toggle
   const newFavorites = await getFavorites();
 
   // Refresh whichever view is active
   if (document.getElementById("favorites").style.display === "block") {
     if (favoritesSearchActive) {
-      // ✅ Stay in Favorites search mode
       displayFavoritesSearch(currentSearchQuery);
     } else {
-      // Normal Favorites page
       displayFavorites("favoritesGrid", true);
     }
   } else if (document.getElementById("profile").style.display === "block") {
