@@ -142,6 +142,7 @@ async function displayProfileSearchResults(gifs, favorites, query = "") {
       message.textContent = "No GIFs Found. Try Another Search!";
       grid.appendChild(message);
     }
+    showToast("No more Profile results", "info"); // ✅ toast
     loadMoreBtn.style.display = "none";
     return;
   }
