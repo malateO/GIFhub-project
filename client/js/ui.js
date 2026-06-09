@@ -241,7 +241,10 @@ function hideAllSections() {
 function showProfilePage() {
   hideAllSections();
 
-  // ✅ Show dashboard elements again when entering Profile
+  // Reset search state and UI so queries don't carry over
+  clearSearchState();
+
+  // Show profile dashboard elements
   const profileHeader = document.querySelector(".profile-header");
   const profileDashboardText = document.getElementById("profileDashboardText");
   const profileSubheader = document.querySelector(".profile-subheader");
@@ -252,14 +255,13 @@ function showProfilePage() {
   const profileSection = document.getElementById("profile");
   if (profileSection) profileSection.style.display = "block";
 
-  // ✅ Hide results box until a search is made
+  // Hide results box until a search is made
   const resultsContainer = document.getElementById("profileSearchResults");
   if (resultsContainer) resultsContainer.style.display = "none";
 
-  // ✅ Reset profile search state
+  // Reset profile search state
   window.profileSearchState = { query: "", offset: 0, limit: 20 };
 
-  // Update UI header/info
   updateUI();
 }
 
@@ -267,10 +269,13 @@ function showProfilePage() {
 function showFavoritesPage() {
   hideAllSections();
 
+  // Reset search state and UI so queries don't carry over
+  clearSearchState();
+
   const favoritesSection = document.getElementById("favorites");
   if (favoritesSection) favoritesSection.style.display = "block";
 
-  // Render favorites grid
+  // Render default favorites grid
   if (typeof displayFavorites === "function") {
     displayFavorites("favoritesGrid", true);
   }
