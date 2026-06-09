@@ -19,6 +19,40 @@ const loginForm = document.getElementById("loginForm");
 const signupForm = document.getElementById("signupForm");
 const authPopup = document.getElementById("auth-popup");
 
+// --- Search state helper ---
+function clearSearchState() {
+  // Clear global query and flags
+  currentSearchQuery = "";
+  favoritesSearchActive = false;
+  isSubmittingSearch = false;
+
+  // Clear search input UI
+  if (searchBar) searchBar.value = "";
+
+  // Hide profile search results UI
+  const profileResults = document.getElementById("profileSearchResults");
+  if (profileResults) {
+    profileResults.style.display = "none";
+    profileResults.classList.remove("active");
+  }
+
+  // Reset profile header
+  const profileHeader = document.getElementById("profileFeatureHeader");
+  if (profileHeader) profileHeader.textContent = "Profile GIFs";
+
+  // Reset favorites header
+  const favoritesHeader = document.getElementById("favoritesHeader");
+  if (favoritesHeader) favoritesHeader.textContent = "My Favorites";
+
+  // Clear result containers to avoid overlap
+  const profileGrid = document.getElementById("profileGifResults");
+  if (profileGrid) profileGrid.innerHTML = "";
+  const favoritesGrid = document.getElementById("favoritesGrid");
+  if (favoritesGrid) favoritesGrid.innerHTML = "";
+  const gifResults = document.getElementById("gifResults");
+  if (gifResults) gifResults.innerHTML = "";
+}
+
 async function loadMoreGifs(query) {
   try {
     const data = await fetchGifs(query, lastDisplayedGifs.length, 20); // ✅ use offset
@@ -133,33 +167,62 @@ const suggestionsContainer = document.getElementById("searchSuggestions");
 searchBar.addEventListener(
   "input",
   debounce(async (event) => {
-    if (isSubmittingSearch) return; // ✅ don’t override submit
+    if (isSubmittingSearch) return;
 
     const query = event.target.value.trim();
-    suggestionsContainer.innerHTML = "";
+    // Clear suggestions container
+    if (suggestionsContainer) suggestionsContainer.innerHTML = "";
 
+    // If the input is empty, restore the current page's default UI
     if (!query) {
-      favoritesSearchActive = false;
-      // restore dashboard...
-      const data = await fetchGifs("");
-      const favorites = await getFavorites();
-      displayGifs(data.data, favorites, false, "");
+      // If on Favorites page, show default favorites
+      if (document.getElementById("favorites").style.display === "block") {
+        favoritesSearchActive = false;
+        displayFavorites("favoritesGrid", true);
+      } else if (document.getElementById("profile").style.display === "block") {
+        // On profile page, hide search results and show dashboard
+        const profileHeader = document.querySelector(".profile-header");
+        const profileDashboardText = document.getElementById(
+          "profileDashboardText",
+        );
+        const profileSubheader = document.querySelector(".profile-subheader");
+        const resultsContainer = document.getElementById(
+          "profileSearchResults",
+        );
+
+        if (profileHeader) profileHeader.style.display = "flex";
+        if (profileDashboardText) profileDashboardText.style.display = "block";
+        if (profileSubheader) profileSubheader.style.display = "block";
+        if (resultsContainer) {
+          resultsContainer.style.display = "none";
+          resultsContainer.classList.remove("active");
+        }
+      } else {
+        // Home page: restore trending
+        const data = await fetchGifs("");
+        const favorites = await getFavorites();
+        displayGifs(data.data, favorites, false, "");
+      }
       return;
     }
 
-    // fetch suggestions
-    const suggestions = await fetchSuggestions(query);
-    suggestions.forEach((s) => {
-      const suggestionItem = document.createElement("div");
-      suggestionItem.className = "suggestion-item";
-      suggestionItem.textContent = s;
-      suggestionItem.addEventListener("click", () => {
-        searchBar.value = s;
-        suggestionsContainer.innerHTML = "";
-        searchForm.requestSubmit();
+    // Otherwise fetch suggestions
+    try {
+      const suggestions = await fetchSuggestions(query);
+      suggestions.forEach((s) => {
+        const suggestionItem = document.createElement("div");
+        suggestionItem.className = "suggestion-item";
+        suggestionItem.textContent = s;
+        suggestionItem.addEventListener("click", () => {
+          searchBar.value = s;
+          if (suggestionsContainer) suggestionsContainer.innerHTML = "";
+          searchForm.requestSubmit();
+        });
+        suggestionsContainer.appendChild(suggestionItem);
       });
-      suggestionsContainer.appendChild(suggestionItem);
-    });
+    } catch (err) {
+      console.error("Suggestion fetch failed", err);
+    }
   }, 400),
 );
 
@@ -293,70 +356,78 @@ fetchGifs("").then(async (data) => {
 // Search form submit handler
 searchForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  isSubmittingSearch = true; // block input listener while submitting
+  if (isSubmittingSearch) return;
+  isSubmittingSearch = true;
 
-  currentSearchQuery = searchBar.value.trim();
-  if (!currentSearchQuery) {
+  const query = searchBar && searchBar.value ? searchBar.value.trim() : "";
+  if (!query) {
     showToast("Please enter a search term", "info");
     isSubmittingSearch = false;
     return;
   }
 
-  // --- Favorites search mode ---
+  // --- Favorites page search ---
   if (document.getElementById("favorites").style.display === "block") {
-    if (suggestionsContainer) suggestionsContainer.innerHTML = "";
-    searchBar.blur();
-
+    // Clear other UI state but keep Favorites visible
+    clearSearchState();
     favoritesSearchActive = true;
-
-    // ✅ Call displayFavoritesSearch so header updates correctly
+    currentSearchQuery = query;
     await displayFavoritesSearch(currentSearchQuery);
-
     isSubmittingSearch = false;
     return;
   }
 
-  // --- Normal search ---
-  if (suggestionsContainer) suggestionsContainer.innerHTML = "";
-  searchBar.blur();
+  // --- Profile page search ---
+  if (document.getElementById("profile").style.display === "block") {
+    // Clear other UI state and hide profile dashboard elements
+    clearSearchState();
+    currentSearchQuery = query;
 
-  const data = await fetchGifs(currentSearchQuery);
-  let favorites = userProfile ? await getFavorites() : [];
-
-  if (userProfile && userProfile.username) {
-    const profileGallery = document.getElementById("profileGifGallery");
-    const resultsContainer = document.getElementById("profileSearchResults");
-
+    // Hide profile dashboard so only search results are visible
     const profileHeader = document.querySelector(".profile-header");
     const profileDashboardText = document.getElementById(
       "profileDashboardText",
     );
     const profileSubheader = document.querySelector(".profile-subheader");
+    const resultsContainer = document.getElementById("profileSearchResults");
     if (profileHeader) profileHeader.style.display = "none";
     if (profileDashboardText) profileDashboardText.style.display = "none";
     if (profileSubheader) profileSubheader.style.display = "none";
 
-    if (profileGallery) {
-      profileGallery.style.display = "block";
-      displayProfileSearchResults(data.data, favorites, currentSearchQuery);
+    // Show results container and run the search
+    if (resultsContainer) {
+      resultsContainer.style.display = "block";
+      resultsContainer.classList.add("active");
     }
 
-    if (resultsContainer) {
-      if (data.data && data.data.length > 0) {
-        resultsContainer.style.display = "block";
-        resultsContainer.classList.add("active");
-      } else {
-        resultsContainer.style.display = "none";
-      }
-    }
-  } else {
-    const featureSection = document.getElementById("feature-section");
-    if (featureSection) featureSection.style.display = "block";
-    displayGifs(data.data, favorites, true, currentSearchQuery);
+    const data = await fetchGifs(currentSearchQuery);
+    const favorites = userProfile ? await getFavorites() : [];
+    displayProfileSearchResults(data.data, favorites, currentSearchQuery);
+
+    isSubmittingSearch = false;
+    return;
   }
 
-  isSubmittingSearch = false; // release flag
+  // --- Home / Feature search ---
+  clearSearchState();
+  currentSearchQuery = query;
+  const data = await fetchGifs(currentSearchQuery);
+  const favorites = userProfile ? await getFavorites() : [];
+  const featureSection = document.getElementById("feature-section");
+  if (featureSection) featureSection.style.display = "block";
+  displayGifs(data.data, favorites, true, currentSearchQuery);
+
+  isSubmittingSearch = false;
 });
+
+// ensure other sections don't show results
+const profileResults = document.getElementById("profileSearchResults");
+if (profileResults) {
+  profileResults.style.display = "none";
+  profileResults.classList.remove("active");
+}
+const gifResults = document.getElementById("gifResults");
+if (gifResults) gifResults.innerHTML = "";
 
 async function displayFavoritesSearch(query, offset = 0, limit = 20) {
   const data = await fetchGifs(query, offset, limit);
