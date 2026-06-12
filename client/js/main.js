@@ -4,6 +4,7 @@ let currentSearchQuery = "";
 let favoritesSearchActive = false;
 let isLoadingMore = false; // ✅ prevent duplicate fetches
 let isSubmittingSearch = false;
+let lastActiveSection = "home"; // can be "home", "profile", or "favorites"
 
 const gifGallery = document.getElementById("gifGallery");
 const searchBar = document.getElementById("searchBar");
@@ -122,47 +123,6 @@ gifGallery.removeEventListener("scroll", onGalleryScroll);
 
 // shared suggestions container (declare near other DOM refs)
 const suggestionsContainer = document.getElementById("searchSuggestions");
-
-// Reset to feature/trending GIFs immediately when the search box is cleared
-// searchBar.addEventListener(
-//   "input",
-//   debounce(async (e) => {
-//     const q = e.target.value.trim();
-
-//     // If not empty, do nothing here (suggestions handler already runs)
-//     if (q) return;
-
-//     // Clear suggestions if any
-//     if (suggestionsContainer) suggestionsContainer.innerHTML = "";
-
-//     // Hide profile search results (if visible)
-//     const resultsContainer = document.getElementById("profileSearchResults");
-//     if (resultsContainer) {
-//       resultsContainer.classList.remove("active");
-//       resultsContainer.style.display = "none";
-//       const profileGrid = document.getElementById("profileGifResults");
-//       if (profileGrid) profileGrid.innerHTML = "";
-//     }
-
-//     // Reset infinite scroll state so Load More behaves predictably
-//     infiniteScrollEnabled = false;
-//     gifGallery.removeEventListener("scroll", onGalleryScroll); // safe remove (see note)
-
-//     // Show spinner while fetching trending
-//     if (spinner) spinner.style.display = "block";
-
-//     try {
-//       const data = await fetchGifs("");
-//       // displayGifs expects (gifs, isSearch, query)
-//       const favorites = await getFavorites();
-//       displayGifs(data.data, favorites, false, "");
-//     } catch (err) {
-//       console.error("GIF fetch failed", err);
-//     } finally {
-//       if (spinner) spinner.style.display = "none";
-//     }
-//   }, 300),
-// );
 
 searchBar.addEventListener(
   "input",
@@ -343,15 +303,16 @@ loadMoreBtn.addEventListener("click", async () => {
   }
 });
 
-// Initial load of trending GIFs
-fetchGifs("").then(async (data) => {
-  let favorites = [];
-  if (userProfile) {
-    // ✅ only if logged in
-    favorites = await getFavorites();
-  }
-  displayGifs(data.data, favorites, false, "");
-});
+// Initial load of GIFs based on saved section
+// const savedSection = localStorage.getItem("lastActiveSection") || "home";
+
+// if (savedSection === "home") {
+//   fetchGifs("").then(async (data) => {
+//     const favorites = userProfile ? await getFavorites() : [];
+//     displayGifs(data.data, favorites, false, "");
+//   });
+// }
+// ✅ For profile/favorites, let updateUI() handle the correct fetch.
 
 // Search form submit handler
 searchForm.addEventListener("submit", async (e) => {
@@ -473,6 +434,50 @@ async function displayFavoritesSearch(query, offset = 0, limit = 20) {
     });
 
     initMasonry("favoritesGrid");
+  }
+}
+
+function showProfilePage() {
+  hideAllSections();
+  clearSearchState();
+  lastActiveSection = "profile";
+  localStorage.setItem("lastActiveSection", lastActiveSection); // ✅ persist
+
+  const profileSection = document.getElementById("profile");
+  if (profileSection) profileSection.style.display = "block";
+  updateUI();
+}
+
+function showFavoritesPage() {
+  hideAllSections();
+  clearSearchState();
+  lastActiveSection = "favorites";
+  localStorage.setItem("lastActiveSection", lastActiveSection); // ✅ persist
+
+  const favoritesSection = document.getElementById("favorites");
+  if (favoritesSection) favoritesSection.style.display = "block";
+  displayFavorites("favoritesGrid", true);
+}
+
+function showHomePage() {
+  hideAllSections();
+  clearSearchState();
+  lastActiveSection = "home";
+  localStorage.setItem("lastActiveSection", lastActiveSection); // ✅ persist
+
+  const featureSection = document.getElementById("feature-section");
+  if (featureSection) featureSection.style.display = "block";
+
+  // ✅ reload trending GIFs immediately when navigating Home
+
+  // Initial load of GIFs based on saved section
+  const savedSection = localStorage.getItem("lastActiveSection") || "home";
+
+  if (savedSection === "home") {
+    fetchGifs("").then(async (data) => {
+      const favorites = userProfile ? await getFavorites() : [];
+      displayGifs(data.data, favorites, false, "");
+    });
   }
 }
 
