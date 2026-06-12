@@ -127,33 +127,38 @@ function getRandomTagline() {
 function updateUI() {
   const featureSection = document.getElementById("feature-section");
   const profileSection = document.getElementById("profile");
+  const favoritesSection = document.getElementById("favorites");
   const loginStatus = document.getElementById("loginStatus");
 
+  // ✅ restore lastActiveSection from localStorage
+  const savedSection = localStorage.getItem("lastActiveSection") || "home";
+
   if (userProfile) {
-    // logged in → show profile dashboard
-    // reset profile search state and hide profile gallery content
-    // logged out → guest mode
     authIcon.addEventListener("click", mobileAuthClickHandler);
     profileSearchState = { query: "", offset: 0, limit: 20 };
-    const profileGrid = document.getElementById("profileGifResults");
-    if (profileGrid) profileGrid.innerHTML = "";
-    const profileLoadMore = document.getElementById("profileLoadMoreBtn");
-    if (profileLoadMore) profileLoadMore.style.display = "none";
 
-    featureSection.style.display = "none";
-    profileSection.style.display = "block";
+    hideAllSections();
+    if (savedSection === "favorites") {
+      if (favoritesSection) favoritesSection.style.display = "block";
+      displayFavorites("favoritesGrid", true);
+    } else if (savedSection === "profile") {
+      if (profileSection) profileSection.style.display = "block";
+      // Optionally trigger a profile fetch if you want results immediately
+    } else {
+      if (featureSection) featureSection.style.display = "block";
+      fetchGifs("").then(async (data) => {
+        const favorites = userProfile ? await getFavorites() : [];
+        displayGifs(data.data, favorites, false, "");
+      });
+    }
 
     loginStatus.textContent = userProfile.username;
     loginStatus.classList.add("logged-in");
     authIcon.classList.add("logged-in");
-
-    // Set username + handle dynamically
     document.getElementById("welcomeMessage").textContent =
       userProfile.username;
     document.getElementById("profileHandle").textContent =
       "@" + userProfile.username;
-
-    // reset dropdown state by removing "open"
     authIcon.classList.remove("open");
   } else {
     // logged out → hide profile completely

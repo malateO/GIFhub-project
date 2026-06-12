@@ -60,10 +60,30 @@ async function toggleFavorite(gif) {
 }
 
 function showFavoritesPage() {
-  hideAllSections();
-  document.getElementById("favorites").style.display = "block";
+  const favoritesSection = document.getElementById("favorites");
 
-  displayFavorites("favoritesGrid");
+  // ✅ If already on Favorites, treat as refresh
+  if (favoritesSection && favoritesSection.style.display === "block") {
+    // Clear search state
+    currentSearchQuery = "";
+    favoritesSearchActive = false;
+
+    // Reset header
+    const favoritesHeader = document.getElementById("favoritesHeader");
+    if (favoritesHeader) favoritesHeader.textContent = "My Favorites";
+
+    // Reset pagination
+    favoritesState.offset = 0;
+
+    // Reload grid
+    displayFavorites("favoritesGrid", true);
+    return;
+  }
+
+  // Normal navigation to Favorites
+  hideAllSections();
+  if (favoritesSection) favoritesSection.style.display = "block";
+  displayFavorites("favoritesGrid", true);
 }
 
 async function displayFavorites(containerId, reset = true) {
