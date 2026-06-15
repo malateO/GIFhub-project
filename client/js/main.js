@@ -437,52 +437,58 @@ async function displayFavoritesSearch(query, offset = 0, limit = 20) {
   }
 }
 
+window.addEventListener("resize", () => {
+  initMasonry("gifResults");
+  initMasonry("profileGifResults");
+  initMasonry("favoritesGrid");
+});
+
 function showProfilePage() {
   hideAllSections();
   clearSearchState();
   lastActiveSection = "profile";
-  localStorage.setItem("lastActiveSection", lastActiveSection); // ✅ persist
+  localStorage.setItem("lastActiveSection", lastActiveSection);
 
   const profileSection = document.getElementById("profile");
   if (profileSection) profileSection.style.display = "block";
-  updateUI();
+
+  const resultsContainer = document.getElementById("profileSearchResults");
+  if (resultsContainer) resultsContainer.style.display = "none";
+
+  window.profileSearchState = { query: "", offset: 0, limit: 20 };
 }
 
 function showFavoritesPage() {
   hideAllSections();
   clearSearchState();
   lastActiveSection = "favorites";
-  localStorage.setItem("lastActiveSection", lastActiveSection); // ✅ persist
+  localStorage.setItem("lastActiveSection", lastActiveSection);
 
   const favoritesSection = document.getElementById("favorites");
   if (favoritesSection) favoritesSection.style.display = "block";
-  displayFavorites("favoritesGrid", true);
+
+  if (typeof displayFavorites === "function") {
+    displayFavorites("favoritesGrid", true);
+  }
 }
 
 function showHomePage() {
   hideAllSections();
   clearSearchState();
   lastActiveSection = "home";
-  localStorage.setItem("lastActiveSection", lastActiveSection); // ✅ persist
+  localStorage.setItem("lastActiveSection", lastActiveSection);
 
   const featureSection = document.getElementById("feature-section");
   if (featureSection) featureSection.style.display = "block";
 
-  // ✅ reload trending GIFs immediately when navigating Home
-
-  // Initial load of GIFs based on saved section
-  const savedSection = localStorage.getItem("lastActiveSection") || "home";
-
-  if (savedSection === "home") {
-    fetchGifs("").then(async (data) => {
-      const favorites = userProfile ? await getFavorites() : [];
-      displayGifs(data.data, favorites, false, "");
-    });
-  }
+  // reload trending GIFs immediately when navigating Home
+  fetchGifs("").then(async (data) => {
+    const favorites = userProfile ? await getFavorites() : [];
+    displayGifs(data.data, favorites, false, "");
+  });
 }
 
-window.addEventListener("resize", () => {
-  initMasonry("gifResults");
-  initMasonry("profileGifResults");
-  initMasonry("favoritesGrid");
-});
+// ✅ Expose globally so HTML onclick works
+window.showProfilePage = showProfilePage;
+window.showFavoritesPage = showFavoritesPage;
+window.showHomePage = showHomePage;

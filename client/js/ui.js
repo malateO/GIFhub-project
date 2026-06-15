@@ -21,21 +21,21 @@ function initMasonry(containerId) {
   return msnry;
 }
 
-function showHomePage() {
-  hideAllSections();
-  clearSearchState();
-  lastActiveSection = "home";
-  localStorage.setItem("lastActiveSection", lastActiveSection); // ✅ persist
+// function showHomePage() {
+//   hideAllSections();
+//   clearSearchState();
+//   lastActiveSection = "home";
+//   localStorage.setItem("lastActiveSection", lastActiveSection); // ✅ persist
 
-  const featureSection = document.getElementById("feature-section");
-  if (featureSection) featureSection.style.display = "block";
+//   const featureSection = document.getElementById("feature-section");
+//   if (featureSection) featureSection.style.display = "block";
 
-  // ✅ reload trending GIFs immediately when navigating Home
-  fetchGifs("").then(async (data) => {
-    const favorites = userProfile ? await getFavorites() : [];
-    displayGifs(data.data, favorites, false, "");
-  });
-}
+//   // ✅ reload trending GIFs immediately when navigating Home
+//   fetchGifs("").then(async (data) => {
+//     const favorites = userProfile ? await getFavorites() : [];
+//     displayGifs(data.data, favorites, false, "");
+//   });
+// }
 
 async function getFavorites() {
   const token = localStorage.getItem("token");
@@ -252,68 +252,3 @@ function hideAllSections() {
   const favoritesGrid = document.getElementById("favoritesGrid");
   if (favoritesGrid) favoritesGrid.innerHTML = "";
 }
-
-// Show Profile page
-// function showProfilePage() {
-//   hideAllSections();
-
-//   // Reset search state and UI so queries don't carry over
-//   clearSearchState();
-//   lastActiveSection = "profile"; // ✅ track section
-
-//   // Show profile dashboard elements
-//   const profileHeader = document.querySelector(".profile-header");
-//   const profileDashboardText = document.getElementById("profileDashboardText");
-//   const profileSubheader = document.querySelector(".profile-subheader");
-//   if (profileHeader) profileHeader.style.display = "flex";
-//   if (profileDashboardText) profileDashboardText.style.display = "block";
-//   if (profileSubheader) profileSubheader.style.display = "block";
-
-//   const profileSection = document.getElementById("profile");
-//   if (profileSection) profileSection.style.display = "block";
-
-//   // Hide results box until a search is made
-//   const resultsContainer = document.getElementById("profileSearchResults");
-//   if (resultsContainer) resultsContainer.style.display = "none";
-
-//   // Reset profile search state
-//   window.profileSearchState = { query: "", offset: 0, limit: 20 };
-
-//   updateUI();
-// }
-
-function showProfilePage() {
-  hideAllSections();
-  clearSearchState();
-  lastActiveSection = "profile";
-  localStorage.setItem("lastActiveSection", lastActiveSection); // ✅ persist
-
-  const profileSection = document.getElementById("profile");
-  if (profileSection) profileSection.style.display = "block";
-
-  const resultsContainer = document.getElementById("profileSearchResults");
-  if (resultsContainer) resultsContainer.style.display = "none";
-
-  window.profileSearchState = { query: "", offset: 0, limit: 20 };
-  updateUI();
-}
-
-// Show Favorites page
-function showFavoritesPage() {
-  hideAllSections();
-  clearSearchState();
-  lastActiveSection = "favorites";
-  localStorage.setItem("lastActiveSection", lastActiveSection); // ✅ persist
-
-  const favoritesSection = document.getElementById("favorites");
-  if (favoritesSection) favoritesSection.style.display = "block";
-
-  if (typeof displayFavorites === "function") {
-    displayFavorites("favoritesGrid", true);
-  }
-}
-
-// Expose globally so HTML onclick works
-window.showProfilePage = showProfilePage;
-window.showFavoritesPage = showFavoritesPage;
-window.hideAllSections = hideAllSections;

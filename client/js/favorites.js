@@ -59,38 +59,34 @@ async function toggleFavorite(gif) {
   }
 }
 
-function showFavoritesPage() {
-  const favoritesSection = document.getElementById("favorites");
+// function showFavoritesPage() {
+//   hideAllSections();
+//   clearSearchState();
 
-  // ✅ If already on Favorites, treat as refresh
-  if (favoritesSection && favoritesSection.style.display === "block") {
-    // Clear search state
-    currentSearchQuery = "";
-    favoritesSearchActive = false;
+//   // ✅ ensure lastActiveSection is updated and persisted
+//   lastActiveSection = "favorites";
+//   localStorage.setItem("lastActiveSection", lastActiveSection);
 
-    // Reset header
-    const favoritesHeader = document.getElementById("favoritesHeader");
-    if (favoritesHeader) favoritesHeader.textContent = "My Favorites";
+//   const favoritesSection = document.getElementById("favorites");
+//   if (favoritesSection) favoritesSection.style.display = "block";
 
-    // Reset pagination
-    favoritesState.offset = 0;
+//   if (typeof displayFavorites === "function") {
+//     displayFavorites("favoritesGrid", true);
+//   }
+// }
 
-    // Reload grid
-    displayFavorites("favoritesGrid", true);
-    return;
-  }
-
-  // Normal navigation to Favorites
-  hideAllSections();
-  if (favoritesSection) favoritesSection.style.display = "block";
-  displayFavorites("favoritesGrid", true);
-}
+// ✅ re‑expose globally so HTML onclick uses the correct version
+// window.showFavoritesPage = showFavoritesPage;
 
 async function displayFavorites(containerId, reset = true) {
-  if (!userProfile) return;
-
-  const container = document.getElementById(containerId); // ✅ define container
+  const container = document.getElementById(containerId);
   if (!container) return;
+
+  if (!userProfile) {
+    container.innerHTML =
+      "<div class='no-results'>Log in to see Favorites</div>";
+    return;
+  }
 
   const token = localStorage.getItem("token");
   const res = await fetch("http://localhost:5000/api/favorites", {

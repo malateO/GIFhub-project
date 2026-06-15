@@ -4,25 +4,31 @@ const authIcon = document.getElementById("authIcon");
 const profileDropdown = document.getElementById("profileDropdown");
 
 // Check if a token exists in localStorage
-const token = localStorage.getItem("token");
-if (token) {
-  // Option 1: If backend has a /api/me route, fetch profile info
-  fetch("http://localhost:5000/api/me", {
-    headers: { Authorization: `Bearer ${token}` },
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      userProfile = { username: data.username, email: data.email };
-      updateUI();
-    })
-    .catch(() => {
-      userProfile = null;
+document.addEventListener("DOMContentLoaded", async () => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    try {
+      const res = await fetch("http://localhost:5000/api/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        userProfile = { username: data.username, email: data.email };
+      } else {
+        localStorage.clear();
+        userProfile = null;
+      }
+    } catch (err) {
       localStorage.clear();
-    });
-} else {
-  userProfile = null;
+      userProfile = null;
+    }
+  } else {
+    userProfile = null;
+  }
+
+  // ✅ Only call updateUI once, after userProfile is set
   updateUI();
-}
+});
 
 const taglines = [
   "Certified Meme Lord 🏆",
@@ -125,33 +131,13 @@ function getRandomTagline() {
 }
 
 function updateUI() {
-  const featureSection = document.getElementById("feature-section");
-  const profileSection = document.getElementById("profile");
-  const favoritesSection = document.getElementById("favorites");
   const loginStatus = document.getElementById("loginStatus");
-
-  // ✅ restore lastActiveSection from localStorage
   const savedSection = localStorage.getItem("lastActiveSection") || "home";
 
+  hideAllSections();
+
   if (userProfile) {
-    authIcon.addEventListener("click", mobileAuthClickHandler);
-    profileSearchState = { query: "", offset: 0, limit: 20 };
-
-    hideAllSections();
-    if (savedSection === "favorites") {
-      if (favoritesSection) favoritesSection.style.display = "block";
-      displayFavorites("favoritesGrid", true);
-    } else if (savedSection === "profile") {
-      if (profileSection) profileSection.style.display = "block";
-      // Optionally trigger a profile fetch if you want results immediately
-    } else {
-      if (featureSection) featureSection.style.display = "block";
-      fetchGifs("").then(async (data) => {
-        const favorites = userProfile ? await getFavorites() : [];
-        displayGifs(data.data, favorites, false, "");
-      });
-    }
-
+    // Logged-in state
     loginStatus.textContent = userProfile.username;
     loginStatus.classList.add("logged-in");
     authIcon.classList.add("logged-in");
@@ -160,26 +146,32 @@ function updateUI() {
     document.getElementById("profileHandle").textContent =
       "@" + userProfile.username;
     authIcon.classList.remove("open");
+
+    // ✅ Delegate navigation
+    if (savedSection === "favorites") {
+      showFavoritesPage();
+    } else if (savedSection === "profile") {
+      showProfilePage();
+    } else {
+      showHomePage();
+    }
   } else {
-    // logged out → hide profile completely
-    // in logout()
-    profileSearchState = { query: "", offset: 0, limit: 20 };
-    const profileGrid = document.getElementById("profileGifResults");
-    if (profileGrid) profileGrid.innerHTML = "";
-
-    profileSection.style.display = "none";
-    featureSection.style.display = "block";
-
+    // Guest state
     loginStatus.textContent = "Guest";
     loginStatus.classList.remove("logged-in");
     authIcon.classList.remove("logged-in");
-
-    // Clear profile header
     document.getElementById("welcomeMessage").textContent = "";
     document.getElementById("profileHandle").textContent = "";
-
-    // ensure dropdown is closed
     authIcon.classList.remove("open");
+
+    // ✅ Delegate navigation
+    if (savedSection === "favorites") {
+      showFavoritesPage(); // shows empty state
+    } else if (savedSection === "profile") {
+      showProfilePage(); // shows empty state
+    } else {
+      showHomePage();
+    }
   }
 
   enableMobileDropdown();
