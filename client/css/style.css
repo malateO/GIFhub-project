@@ -345,6 +345,12 @@ body {
 }
 
 #feature-section,
+#profile,
+#favorites {
+  display: none;
+}
+
+#feature-section,
 #profile {
   background: linear-gradient(135deg, #f9f0ff, #e6ccff, #d1a3ff);
   padding: 20px;
@@ -850,7 +856,7 @@ main {
 }
 
 #favorites {
-  display: block;
+  display: none;
   background: linear-gradient(135deg, #f9f0ff, #e6ccff, #d1a3ff);
   padding: 20px;
   border-radius: 12px;

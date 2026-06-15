@@ -253,11 +253,17 @@
     <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
     <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
 
-    <!-- Scripts: ui first, then api, main, favorites, auth -->
-    <script src="js/ui.js" defer></script>
+    <!-- Core helpers first -->
     <script src="js/api.js" defer></script>
-    <script src="js/auth.js" defer></script>
-    <script src="js/main.js" defer></script>
+    <script src="js/ui.js" defer></script>
+
+    <!-- Favorites logic (toggle/display only, no navigation) -->
     <script src="js/favorites.js" defer></script>
+
+    <!-- Auth + updateUI (runs after token check) -->
+    <script src="js/auth.js" defer></script>
+
+    <!-- Main navigation + consolidated showXPage functions -->
+    <script src="js/main.js" defer></script>
   </body>
 </html>
