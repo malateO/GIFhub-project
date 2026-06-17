@@ -13,7 +13,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
       if (res.ok) {
         const data = await res.json();
-        userProfile = { username: data.username, email: data.email };
+        userProfile = {
+          username: data.username,
+          email: data.email,
+          profileImage: data.profileImage, // ✅ include profileImage
+        };
       } else {
         localStorage.clear();
         userProfile = null;
@@ -51,7 +55,11 @@ async function login(identifier, password) {
 
     if (res.ok) {
       localStorage.setItem("token", data.token);
-      userProfile = { username: data.username, email: data.email };
+      userProfile = {
+        username: data.username,
+        email: data.email,
+        profileImage: data.profileImage || null, // ✅ include profileImage
+      };
       updateUI();
       closeModal();
 
@@ -114,7 +122,11 @@ async function createAccount(username, password, email) {
 
     if (res.ok) {
       localStorage.setItem("token", data.token);
-      userProfile = { username: data.username, email: data.email };
+      userProfile = {
+        username: data.username,
+        email: data.email,
+        profileImage: data.profileImage || null, // ✅ include profileImage
+      };
       updateUI();
       closeModal();
     } else {
@@ -131,6 +143,9 @@ function getRandomTagline() {
 }
 
 function updateUI() {
+  document.querySelector(".profile-avatar").src =
+    userProfile?.profileImage || "assets/profile-avatar.png";
+
   const loginStatus = document.getElementById("loginStatus");
   const savedSection = localStorage.getItem("lastActiveSection") || "home";
 
@@ -324,3 +339,32 @@ async function loadProfileFavorites() {
   // ✅ Make sure renderFavorites is implemented
   renderFavorites(data.favorites);
 }
+
+document
+  .getElementById("uploadProfileImageBtn")
+  .addEventListener("click", async () => {
+    const fileInput = document.getElementById("profileImageInput");
+    const file = fileInput.files[0];
+    if (!file) {
+      alert("Please select an image first");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    const token = localStorage.getItem("token");
+    const res = await fetch("http://localhost:5000/api/profile/upload", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      document.querySelector(".profile-avatar").src = data.profileImage;
+      showToast("Profile image updated!", "person");
+    } else {
+      alert(data.error || "Upload failed");
+    }
+  });
