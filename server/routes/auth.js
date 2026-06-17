@@ -2,6 +2,18 @@ import bcrypt from "bcrypt";
 import express from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import multer from "multer";
+import path from "path";
+import authenticateToken from "../middleware/authMiddleware.js";
+
+// Configure storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, path.join(process.cwd(), "uploads")), // ✅ no extra "server/"
+  filename: (req, file, cb) =>
+    cb(null, req.user.id + path.extname(file.originalname)),
+});
+
+const upload = multer({ storage });
 
 const router = express.Router();
 
@@ -12,7 +24,13 @@ router.post("/signup", async (req, res) => {
 
     // Hash password before saving
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ username, email, password: hashedPassword });
+    // ✅ include profileImage with a default placeholder
+    const newUser = new User({
+      username,
+      email,
+      password: hashedPassword,
+      profileImage: "/uploads/default-avatar.png", // or null if you prefer
+    });
 
     await newUser.save();
 
@@ -22,6 +40,7 @@ router.post("/signup", async (req, res) => {
         id: newUser._id,
         username: newUser.username,
         email: newUser.email,
+        profileImage: newUser.profileImage, // ✅ include in payload
       },
       process.env.JWT_SECRET,
       { expiresIn: "1h" },
@@ -31,6 +50,7 @@ router.post("/signup", async (req, res) => {
       token,
       username: newUser.username,
       email: newUser.email,
+      profileImage: newUser.profileImage,
     });
   } catch (err) {
     if (err.code === 11000) {
@@ -65,12 +85,22 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ error: "Invalid Password" });
 
     const token = jwt.sign(
-      { id: user._id, username: user.username, email: user.email },
+      {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        profileImage: user.profileImage, // optional
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1h" },
     );
 
-    res.json({ token, username: user.username, email: user.email });
+    res.json({
+      token,
+      username: user.username,
+      email: user.email,
+      profileImage: user.profileImage,
+    });
   } catch (err) {
     res.status(500).json({ error: "Server error: " + err.message });
   }
@@ -100,10 +130,37 @@ router.get("/me", async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.json({ username: user.username, email: user.email });
+    res.json({
+      username: user.username,
+      email: user.email,
+      profileImage: user.profileImage, // full URL from DB
+    });
   } catch (err) {
     res.status(401).json({ error: "Invalid or expired token" });
   }
 });
+
+// POST /api/profile/upload
+router.post(
+  "/profile/upload",
+  authenticateToken,
+  upload.single("avatar"),
+  async (req, res) => {
+    try {
+      const user = await User.findById(req.user.id);
+      if (!user) return res.status(404).json({ error: "User not found" });
+
+      user.profileImage = `http://localhost:5000/uploads/${req.file.filename}`;
+      await user.save();
+
+      res.json({
+        message: "Profile image updated",
+        profileImage: user.profileImage, // full URL
+      });
+    } catch (err) {
+      res.status(500).json({ error: "Upload failed" });
+    }
+  },
+);
 
 export default router;

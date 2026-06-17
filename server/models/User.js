@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
       images: { type: Object },
     },
   ],
+  profileImage: { type: String }, // ✅ store image URL or path
 });
 
 // Step B. Turn Schema into a model
