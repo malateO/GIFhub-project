@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
 });
 
 // Import routes in ES module style
-import authRoutes from "./routes/auth.js";
+import authRoutes from "./routes/authRoutes.js";
 app.use("/api", authRoutes);
 
 import favoritesRoutes from "./routes/favorites.js";
