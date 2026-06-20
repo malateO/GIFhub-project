@@ -3,6 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Cropper.js CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"
+    />
+
     <link rel="stylesheet" href="css/style.css" />
     <link
       rel="stylesheet"
@@ -96,13 +103,22 @@
 
       <section id="profile" style="display: none">
         <header class="profile-header">
-          <img
-            src="assets/profile-avatar.png"
-            alt="User Avatar"
-            class="profile-avatar"
-          />
-          <input type="file" id="profileImageInput" accept="image/*" />
-          <button id="uploadProfileImageBtn">Upload Image</button>
+          <div class="avatar-wrapper">
+            <img
+              src="assets/profile-avatar.png"
+              alt="User Avatar"
+              class="profile-avatar"
+            />
+            <div class="avatar-add-btn" id="openAvatarModal">
+              <span class="material-symbols-outlined">add</span>
+            </div>
+            <input
+              type="file"
+              id="avatarFileInput"
+              accept="image/*"
+              style="display: none"
+            />
+          </div>
 
           <div class="profile-info">
             <h2 id="welcomeMessage"></h2>
@@ -111,6 +127,21 @@
             <p id="profileEmail"></p>
           </div>
         </header>
+
+        <!-- Avatar Edit Modal -->
+        <div id="avatarModal" class="popup-overlay">
+          <div class="popup-content avatar-modal">
+            <span class="close-btn" id="closeAvatarModal">&times;</span>
+            <h2>Edit Profile Picture</h2>
+            <div id="cropArea">
+              <!-- Cropping image will be injected here -->
+            </div>
+            <div class="modal-actions">
+              <button id="cancelAvatarBtn" class="btn-cancel">Cancel</button>
+              <button id="saveAvatarBtn" class="btn-save">Save</button>
+            </div>
+          </div>
+        </div>
 
         <h3 class="profile-subheader">Profile Dashboard</h3>
         <p id="profileDashboardText">Manage your account and explore GIFs.</p>
@@ -252,6 +283,9 @@
       <span id="toastMessage">You are now browsing as Guest</span>
     </div>
 
+    <!-- Cropper.js JS (UMD build, exposes window.Cropper) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
     <!-- Masonry layout library -->
     <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
     <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
@@ -260,13 +294,13 @@
     <script src="js/api.js" defer></script>
     <script src="js/ui.js" defer></script>
 
-    <!-- Favorites logic (toggle/display only, no navigation) -->
+    <!-- Favorites logic -->
     <script src="js/favorites.js" defer></script>
 
-    <!-- Auth + updateUI (runs after token check) -->
+    <!-- Auth + updateUI -->
     <script src="js/auth.js" defer></script>
 
-    <!-- Main navigation + consolidated showXPage functions -->
+    <!-- Main navigation -->
     <script src="js/main.js" defer></script>
   </body>
 </html>

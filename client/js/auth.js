@@ -340,31 +340,123 @@ async function loadProfileFavorites() {
   renderFavorites(data.favorites);
 }
 
-document
-  .getElementById("uploadProfileImageBtn")
-  .addEventListener("click", async () => {
-    const fileInput = document.getElementById("profileImageInput");
-    const file = fileInput.files[0];
-    if (!file) {
-      alert("Please select an image first");
-      return;
-    }
+document.addEventListener("DOMContentLoaded", () => {
+  const openBtn = document.getElementById("openAvatarModal");
+  const fileInput = document.getElementById("avatarFileInput");
+  const closeBtn = document.getElementById("closeAvatarModal");
+  const cancelBtn = document.getElementById("cancelAvatarBtn");
+  const saveBtn = document.getElementById("saveAvatarBtn");
+  const cropArea = document.getElementById("cropArea");
+  let cropper;
 
-    const formData = new FormData();
-    formData.append("avatar", file);
-
-    const token = localStorage.getItem("token");
-    const res = await fetch("http://localhost:5000/api/profile/upload", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
+  // Plus button → trigger file picker
+  if (openBtn) {
+    openBtn.addEventListener("click", () => {
+      fileInput.click();
     });
+  }
 
-    const data = await res.json();
-    if (res.ok) {
-      document.querySelector(".profile-avatar").src = data.profileImage;
-      showToast("Profile image updated!", "person");
-    } else {
-      alert(data.error || "Upload failed");
-    }
+  // When a file is chosen
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      document.getElementById("avatarModal").classList.add("show");
+
+      const img = document.createElement("img");
+      img.src = reader.result;
+      cropArea.innerHTML = "";
+      cropArea.appendChild(img);
+
+      console.log("Initializing cropper:", window.Cropper);
+      cropper = new window.Cropper(img, {
+        aspectRatio: 1,
+        viewMode: 1,
+        autoCropArea: 1,
+        responsive: true,
+        movable: true,
+        zoomable: true,
+      });
+      console.log("Cropper instance:", cropper);
+    };
+    reader.readAsDataURL(file);
   });
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      document.getElementById("avatarModal").classList.remove("show");
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+    });
+  }
+
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", () => {
+      document.getElementById("avatarModal").classList.remove("show");
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+    });
+  }
+
+  if (saveBtn) {
+    saveBtn.addEventListener("click", () => {
+      console.log("Cropper at save:", cropper);
+      if (!cropper) {
+        showToast("No image selected to crop", "error");
+        return;
+      }
+
+      // Ensure cropper is ready
+      if (!cropper.ready) {
+        showToast("Cropper not ready yet", "error");
+        return;
+      }
+
+      const canvas = cropper.getCroppedCanvas({ width: 200, height: 200 });
+      if (!canvas) {
+        showToast("Crop failed", "error");
+        return;
+      }
+
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          showToast("Could not create image blob", "error");
+          return;
+        }
+
+        console.log("Blob created:", blob); // ✅ debug log
+
+        const formData = new FormData();
+        formData.append("avatar", blob, "avatar.png");
+
+        const token = localStorage.getItem("token");
+        fetch("http://localhost:5000/api/profile/upload", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.error) {
+              showToast("Upload failed: " + data.error, "error");
+              return;
+            }
+            document.querySelector(".profile-avatar").src = data.profileImage;
+            userProfile.profileImage = data.profileImage;
+            document.getElementById("avatarModal").classList.remove("show");
+            showToast("Profile image updated!", "person");
+          })
+          .catch((err) => {
+            console.error("Upload error:", err);
+            showToast("Upload failed", "error");
+          });
+      }, "image/png");
+    });
+  }
+});
