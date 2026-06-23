@@ -1118,3 +1118,103 @@ main,
   font-size: 18px;
   color: #fff;
 }
+
+.site-footer {
+  background: rgba(128, 0, 128, 0.85); /* semi-transparent purple */
+  color: #f9f0ff; /* light text for contrast */
+  padding: 1rem 1.5rem; /* compact height */
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  border-top: 2px solid rgba(255, 255, 255, 0.2); /* subtle divider */
+}
+
+.footer-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.footer-container div {
+  flex: 1 1 180px;
+  margin: 0.5rem;
+}
+
+.footer-links ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin: 0.3rem 0;
+}
+
+.footer-links a {
+  color: #f9f0ff;
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
+.footer-bottom {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: #e6ccff; /* softer purple accent */
+}
+
+.about-header {
+  background: rgba(106, 13, 173, 0.95); /* stronger purple */
+  color: #fff;
+  padding: 1.5rem;
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.25);
+  letter-spacing: 1px;
+}
+
+.about-content {
+  background: linear-gradient(
+    135deg,
+    #f3e6ff,
+    #e6ccff,
+    #d1a3ff
+  ); /* lighter purple gradient */
+  color: #2c003e; /* dark purple text for readability */
+  padding: 2rem;
+  border-radius: 12px;
+  margin: 2rem auto;
+  max-width: 900px;
+  line-height: 1.8;
+  font-size: 1.05rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.about-content h3 {
+  color: #6a0dad; /* strong purple accent */
+  margin-top: 2rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.about-intro {
+  font-size: 1.15rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  color: #1a0b1f; /* deep purple for clarity */
+}
+
+.about-features {
+  list-style: none;
+  padding: 0;
+}
+
+.about-features li {
+  margin: 0.8rem 0;
+  font-size: 1rem;
+  color: #333; /* darker text for readability */
+}

@@ -488,6 +488,18 @@ function showHomePage() {
   });
 }
 
+function showAboutPage() {
+  hideAllSections();
+  clearSearchState();
+  lastActiveSection = "about";
+  localStorage.setItem("lastActiveSection", lastActiveSection);
+
+  const aboutSection = document.getElementById("about");
+  if (aboutSection) aboutSection.style.display = "block";
+}
+
+window.showAboutPage = showAboutPage;
+
 // ✅ Expose globally so HTML onclick works
 window.showProfilePage = showProfilePage;
 window.showFavoritesPage = showFavoritesPage;

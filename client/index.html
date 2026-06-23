@@ -28,7 +28,9 @@
         <!-- Center: Desktop links -->
         <ul class="nav-links">
           <li class="navlist desktop-only"><a href="#">Forum</a></li>
-          <li class="navlist desktop-only"><a href="#">About</a></li>
+          <li class="navlist desktop-only">
+            <a href="#" onclick="showAboutPage()">About</a>
+          </li>
         </ul>
 
         <!-- Right: Mobile icons + Auth -->
@@ -37,7 +39,10 @@
             <span class="material-symbols-outlined mobile-only" title="Forum"
               >forum</span
             >
-            <span class="material-symbols-outlined mobile-only" title="About"
+            <span
+              class="material-symbols-outlined mobile-only"
+              title="About"
+              onclick="showAboutPage()"
               >info</span
             >
           </div>
@@ -194,6 +199,39 @@
           </button>
         </div>
       </section>
+
+      <section id="about" style="display: none">
+        <header class="about-header">
+          <h2>About GifHub</h2>
+        </header>
+
+        <div class="about-content">
+          <p class="about-intro">
+            GifHub is an open-source hub for discovering, sharing, and saving
+            the funniest GIFs across the web.
+          </p>
+
+          <h3>Our Mission</h3>
+          <p>
+            We believe humor connects people. GifHub makes it simple to search,
+            collect, and enjoy GIFs with friends and communities.
+          </p>
+
+          <h3>Features</h3>
+          <ul class="about-features">
+            <li>🔍 Powerful search powered by Giphy API</li>
+            <li>❤️ Save favorites with one click</li>
+            <li>👤 Personalized profile with avatar upload</li>
+            <li>📱 Responsive design for desktop and mobile</li>
+          </ul>
+
+          <h3>Open Source</h3>
+          <p>
+            GifHub is a community-driven project. Contributions are welcome to
+            improve features, fix bugs, and expand functionality.
+          </p>
+        </div>
+      </section>
     </main>
 
     <div
@@ -303,4 +341,43 @@
     <!-- Main navigation -->
     <script src="js/main.js" defer></script>
   </body>
+  <footer class="site-footer">
+    <div class="footer-container">
+      <!-- Branding -->
+      <div class="footer-brand">
+        <h3>GifHub</h3>
+        <p>Open-source hub for all the funny GIFs.</p>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="footer-links">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="#" onclick="showHomePage()">Home</a></li>
+          <li><a href="#" onclick="showFavoritesPage()">Favorites</a></li>
+          <li><a href="#" onclick="showProfilePage()">Profile</a></li>
+          <li><a href="#" onclick="showAboutPage()">About</a></li>
+        </ul>
+      </div>
+
+      <!-- Advertise Functions -->
+      <div class="footer-advertise">
+        <h4>Features</h4>
+        <p>🔍 Search GIFs instantly</p>
+        <p>❤️ Save your favorites</p>
+        <p>👤 Customize your profile</p>
+      </div>
+
+      <!-- Contact / Social -->
+      <div class="footer-contact">
+        <h4>Connect</h4>
+        <p>Email: support@gifhub.dev</p>
+        <p>Follow us on Twitter @GifHub</p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 GifHub. All rights reserved.</p>
+    </div>
+  </footer>
 </html>
