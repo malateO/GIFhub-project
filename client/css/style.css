@@ -5,8 +5,30 @@
   padding: 0;
 }
 
+:root {
+  --bg-gradient-start: #f6e6ff;
+  --bg-gradient-mid: #e0b3ff;
+  --bg-gradient-end: #c68cff;
+  --text-color: #2c003e;
+  --nav-link-color: #000;
+}
+
+body.dark-mode {
+  --bg-gradient-start: #1a0b1f;
+  --bg-gradient-mid: #2c003e;
+  --bg-gradient-end: #3a0d4f;
+  --text-color: #f3e6ff;
+  --nav-link-color: #fff;
+}
+
 body {
-  background: linear-gradient(135deg, #f6e6ff, #e0b3ff, #c68cff);
+  background: linear-gradient(
+    135deg,
+    var(--bg-gradient-start),
+    var(--bg-gradient-mid),
+    var(--bg-gradient-end)
+  );
+  color: var(--text-color);
   overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
@@ -34,7 +56,7 @@ body {
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 15px;
 }
 
 .navdiv ul {
@@ -59,7 +81,7 @@ body {
   text-decoration: none;
   margin-right: 25px;
   font-weight: bold;
-  color: black;
+  color: var(--nav-link-color);
 }
 
 .auth-icon {
@@ -1001,7 +1023,7 @@ main,
 
 .mobile-icons .material-symbols-outlined {
   font-size: 22px;
-  color: #6a0dad;
+  color: var(--nav-link-color);
   cursor: pointer;
   transition: transform 0.2s ease;
 }
@@ -1032,7 +1054,7 @@ main,
   .mobile-only {
     display: inline-block !important; /* force show icons */
     font-size: 22px;
-    color: #6a0dad;
+    color: var(--nav-link-color);
     margin-right: 8px;
     cursor: pointer;
     transition: transform 0.2s ease;
@@ -1053,6 +1075,7 @@ main,
 .desktop-only {
   display: inline-block;
 }
+
 .mobile-only {
   display: none !important; /* always hidden on desktop */
 }
@@ -1065,7 +1088,7 @@ main,
   .mobile-only {
     display: inline-block !important; /* force show icons */
     font-size: 22px;
-    color: #6a0dad;
+    color: var(--nav-link-color);
     margin-right: 8px;
     cursor: pointer;
     transition: transform 0.2s ease;
@@ -1164,6 +1187,100 @@ main,
   margin-top: 1rem;
   font-size: 0.8rem;
   color: #e6ccff; /* softer purple accent */
+}
+
+.theme-toggle {
+  cursor: pointer;
+  font-size: 22px;
+  color: var(--nav-link-color); /* black in light, white in dark */
+  transition: transform 0.2s ease;
+  margin-left: 10px; /* spacing from mobile icons */
+}
+
+.theme-toggle:hover {
+  transform: scale(1.2);
+}
+
+/* Switch container */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 22px;
+}
+
+/* Hide default checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Slider background */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 34px;
+  transition: 0.4s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5px;
+  font-size: 14px;
+}
+
+/* Light mode appearance */
+body:not(.dark-mode) .slider {
+  background-color: #4b006e; /* dark purple fill */
+  border: 1px solid #d9b3ff; /* light lavender outline */
+  color: #fff;
+}
+
+body.dark-mode .slider {
+  background-color: #d9b3ff; /* light lavender fill */
+  border: 1px solid #4b006e; /* dark purple outline */
+  color: #2c003e;
+}
+
+/* Circle knob */
+.slider::before {
+  content: "";
+  position: absolute;
+  height: 15px; /* smaller knob fits track */
+  width: 15px;
+  left: 3px;
+  top: 50%; /* center vertically */
+  transform: translateY(-50%); /* perfect centering */
+  background-color: #fff;
+  border-radius: 50%;
+  transition: 0.4s;
+}
+
+/* Light mode knob */
+body:not(.dark-mode) .slider::before {
+  background-color: #d9b3ff; /* light lavender knob */
+  border: 1px solid #4b006e; /* dark purple outline */
+}
+
+/* Dark mode knob */
+body.dark-mode .slider::before {
+  background-color: #4b006e; /* dark purple knob */
+  border: 1px solid #d9b3ff; /* light lavender outline */
+}
+
+/* Move knob when checked */
+.switch input:checked + .slider::before {
+  transform: translate(20px, -50%);
+}
+
+/* Icons inside slider */
+.slider .material-symbols-outlined {
+  font-size: 14px;
+  pointer-events: none;
 }
 
 .about-header {
