@@ -20,6 +20,32 @@ const loginForm = document.getElementById("loginForm");
 const signupForm = document.getElementById("signupForm");
 const authPopup = document.getElementById("auth-popup");
 
+const themeIcon = document.getElementById("themeIcon");
+const themeSwitch = document.getElementById("themeSwitch");
+
+themeSwitch.addEventListener("change", () => {
+  if (themeSwitch.checked) {
+    document.body.classList.add("dark-mode");
+    themeIcon.textContent = "light_mode"; // show sun when dark
+    localStorage.setItem("theme", "dark");
+  } else {
+    document.body.classList.remove("dark-mode");
+    themeIcon.textContent = "dark_mode"; // show moon when light
+    localStorage.setItem("theme", "light");
+  }
+});
+
+// ✅ Load saved preference
+const savedTheme = localStorage.getItem("theme");
+if (savedTheme === "dark") {
+  document.body.classList.add("dark-mode");
+  themeSwitch.checked = true;
+  themeIcon.textContent = "light_mode";
+} else {
+  themeSwitch.checked = false;
+  themeIcon.textContent = "dark_mode";
+}
+
 // --- Search state helper ---
 function clearSearchState() {
   // Clear global query and flags
@@ -452,6 +478,13 @@ function showProfilePage() {
   const profileSection = document.getElementById("profile");
   if (profileSection) profileSection.style.display = "block";
 
+  // ✅ Show search + header again
+  const searchBlock = document.querySelector(".search-block");
+  if (searchBlock) searchBlock.style.display = "block";
+
+  const mainHeader = document.querySelector(".hero");
+  if (mainHeader) mainHeader.style.display = "block";
+
   const resultsContainer = document.getElementById("profileSearchResults");
   if (resultsContainer) resultsContainer.style.display = "none";
 
@@ -467,6 +500,13 @@ function showFavoritesPage() {
   const favoritesSection = document.getElementById("favorites");
   if (favoritesSection) favoritesSection.style.display = "block";
 
+  // ✅ Show search + header again
+  const searchBlock = document.querySelector(".search-block");
+  if (searchBlock) searchBlock.style.display = "block";
+
+  const mainHeader = document.querySelector(".hero");
+  if (mainHeader) mainHeader.style.display = "block";
+
   if (typeof displayFavorites === "function") {
     displayFavorites("favoritesGrid", true);
   }
@@ -480,6 +520,13 @@ function showHomePage() {
 
   const featureSection = document.getElementById("feature-section");
   if (featureSection) featureSection.style.display = "block";
+
+  // ✅ Show search + header again
+  const searchBlock = document.querySelector(".search-block");
+  if (searchBlock) searchBlock.style.display = "block";
+
+  const mainHeader = document.querySelector(".hero");
+  if (mainHeader) mainHeader.style.display = "block";
 
   // reload trending GIFs immediately when navigating Home
   fetchGifs("").then(async (data) => {
@@ -496,6 +543,13 @@ function showAboutPage() {
 
   const aboutSection = document.getElementById("about");
   if (aboutSection) aboutSection.style.display = "block";
+
+  // ✅ Hide search bar + main header
+  const searchBlock = document.querySelector(".search-block");
+  if (searchBlock) searchBlock.style.display = "none";
+
+  const mainHeader = document.querySelector(".hero");
+  if (mainHeader) mainHeader.style.display = "none";
 }
 
 window.showAboutPage = showAboutPage;
