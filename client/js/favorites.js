@@ -3,7 +3,7 @@ let favoritesState = {
   limit: 20,
 };
 
-async function toggleFavorite(gif) {
+export async function toggleFavorite(gif) {
   if (!userProfile) {
     alert("Please log in to save Favorites!");
     return;
@@ -59,26 +59,7 @@ async function toggleFavorite(gif) {
   }
 }
 
-// function showFavoritesPage() {
-//   hideAllSections();
-//   clearSearchState();
-
-//   // ✅ ensure lastActiveSection is updated and persisted
-//   lastActiveSection = "favorites";
-//   localStorage.setItem("lastActiveSection", lastActiveSection);
-
-//   const favoritesSection = document.getElementById("favorites");
-//   if (favoritesSection) favoritesSection.style.display = "block";
-
-//   if (typeof displayFavorites === "function") {
-//     displayFavorites("favoritesGrid", true);
-//   }
-// }
-
-// ✅ re‑expose globally so HTML onclick uses the correct version
-// window.showFavoritesPage = showFavoritesPage;
-
-async function displayFavorites(containerId, reset = true) {
+export async function displayFavorites(containerId, reset = true) {
   const container = document.getElementById(containerId);
   if (!container) return;
 

@@ -1,5 +1,13 @@
-let userProfile = null;
+import {
+  hideAllSections,
+  showHomePage,
+  showProfilePage,
+  showFavoritesPage,
+} from "./ui.js";
 
+export let userProfile = null;
+
+const authPopup = document.getElementById("auth-popup");
 const authIcon = document.getElementById("authIcon");
 const profileDropdown = document.getElementById("profileDropdown");
 
@@ -16,7 +24,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         userProfile = {
           username: data.username,
           email: data.email,
-          profileImage: data.profileImage, // ✅ include profileImage
+          profileImage: data.profileImage,
         };
       } else {
         localStorage.clear();
@@ -29,21 +37,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   } else {
     userProfile = null;
   }
-
-  // ✅ Only call updateUI once, after userProfile is set
   updateUI();
 });
 
 const taglines = [
   "Certified Meme Lord 🏆",
-  "Saving GIFs like it\’s a full-time job 💼",
+  "Saving GIFs like it’s a full-time job 💼",
   "Keeper of the LOLs 😂",
   "Professional GIF curator 🎨",
   "Brofessional in GIFconomics 📈",
   "Legit Aura Farmer 🌾✨",
 ];
 
-async function login(identifier, password) {
+export async function login(identifier, password) {
   try {
     const res = await fetch("http://localhost:5000/api/login", {
       method: "POST",
@@ -58,12 +64,11 @@ async function login(identifier, password) {
       userProfile = {
         username: data.username,
         email: data.email,
-        profileImage: data.profileImage || null, // ✅ include profileImage
+        profileImage: data.profileImage || null,
       };
       updateUI();
       closeModal();
 
-      // ✅ clear inputs only after success
       document.getElementById("loginUsername").value = "";
       document.getElementById("loginPassword").value = "";
       searchBar.value = "";
@@ -76,7 +81,7 @@ async function login(identifier, password) {
   }
 }
 
-function logout() {
+export function logout() {
   localStorage.clear();
   userProfile = null;
   currentSearchQuery = "";
@@ -92,26 +97,22 @@ function logout() {
 
   updateUI();
 
-  // ✅ don’t call getFavorites after logout
   fetchGifs("").then((data) => {
     displayGifs(data.data, [], false, "");
   });
 
   closeModal();
 
-  authPopup.classList.remove("show"); // ✅ redundant safety
-  authPopup.style.visibility = "hidden"; // ✅ redundant safety
-  // ✅ reset dropdown state so no modal auto‑opens
+  authPopup.classList.remove("show");
+  authPopup.style.visibility = "hidden";
   authIcon.classList.remove("open");
-  // ✅ temporarily disable click handler until user interacts again
   authIcon.removeEventListener("click", mobileAuthClickHandler);
   enableMobileDropdown();
 
-  // ✅ Show guest mode toast
   showToast("You are now browsing as Guest");
 }
 
-async function createAccount(username, password, email) {
+export async function createAccount(username, password, email) {
   try {
     const res = await fetch("http://localhost:5000/api/signup", {
       method: "POST",
@@ -125,7 +126,7 @@ async function createAccount(username, password, email) {
       userProfile = {
         username: data.username,
         email: data.email,
-        profileImage: data.profileImage || null, // ✅ include profileImage
+        profileImage: data.profileImage || null,
       };
       updateUI();
       closeModal();
@@ -137,12 +138,12 @@ async function createAccount(username, password, email) {
   }
 }
 
-function getRandomTagline() {
+export function getRandomTagline() {
   const index = Math.floor(Math.random() * taglines.length);
   return taglines[index];
 }
 
-function updateUI() {
+export function updateUI() {
   document.querySelector(".profile-avatar").src =
     userProfile?.profileImage || "assets/profile-avatar.png";
 
@@ -152,7 +153,6 @@ function updateUI() {
   hideAllSections();
 
   if (userProfile) {
-    // Logged-in state
     loginStatus.textContent = userProfile.username;
     loginStatus.classList.add("logged-in");
     authIcon.classList.add("logged-in");
@@ -162,7 +162,6 @@ function updateUI() {
       "@" + userProfile.username;
     authIcon.classList.remove("open");
 
-    // ✅ Delegate navigation
     if (savedSection === "favorites") {
       showFavoritesPage();
     } else if (savedSection === "profile") {
@@ -171,7 +170,6 @@ function updateUI() {
       showHomePage();
     }
   } else {
-    // Guest state
     loginStatus.textContent = "Guest";
     loginStatus.classList.remove("logged-in");
     authIcon.classList.remove("logged-in");
@@ -179,11 +177,10 @@ function updateUI() {
     document.getElementById("profileHandle").textContent = "";
     authIcon.classList.remove("open");
 
-    // ✅ Delegate navigation
     if (savedSection === "favorites") {
-      showFavoritesPage(); // shows empty state
+      showFavoritesPage();
     } else if (savedSection === "profile") {
-      showProfilePage(); // shows empty state
+      showProfilePage();
     } else {
       showHomePage();
     }
@@ -194,37 +191,31 @@ function updateUI() {
 
 function mobileAuthClickHandler() {
   if (userProfile) {
-    // Logged in → toggle dropdown
     authIcon.classList.toggle("open");
   } else {
-    // Logged out → open modal when user clicks the icon
     openModal();
   }
 }
 
-function enableMobileDropdown() {
-  // Clean up first
+export function enableMobileDropdown() {
   authIcon.removeEventListener("click", mobileAuthClickHandler);
 
-  // Always allow click when logged out (to open modal)
   if (!userProfile) {
     setTimeout(() => {
       authIcon.addEventListener("click", mobileAuthClickHandler);
     }, 0);
-
     return;
   }
 
-  // Only attach click handler for logged-in users on mobile
   if (window.matchMedia("(hover: none)").matches) {
     authIcon.addEventListener("click", mobileAuthClickHandler);
   }
 }
 
-enableMobileDropdown();
+// Open modal
+export function openModal() {
+  if (!authPopup) return; // ✅ guard against null
 
-//Open modal
-function openModal() {
   authPopup.style.visibility = "visible";
   authPopup.classList.add("show");
 
@@ -240,10 +231,11 @@ function openModal() {
   );
 }
 
-//Close Modal
-function closeModal() {
+// Close Modal
+export function closeModal() {
+  if (!authPopup) return; // ✅ prevents null reference
   authPopup.classList.remove("show");
-  authPopup.style.visibility = "hidden"; // ✅ force hidden
+  authPopup.style.visibility = "hidden";
 }
 
 // ===== Tab Switching ======
@@ -265,15 +257,11 @@ signupTab.addEventListener("click", () => {
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  // ✅ Only run if modal is visible
-  if (!authPopup.classList.contains("show")) {
-    return; // do nothing if modal is closed
-  }
+  if (!authPopup.classList.contains("show")) return;
 
   const identifier = document.getElementById("loginUsername").value;
   const password = document.getElementById("loginPassword").value;
 
-  // ✅ Frontend validation
   if (!identifier || !password) {
     alert("Please enter both username/email and password");
     return;
@@ -295,7 +283,7 @@ loginForm.addEventListener("submit", (e) => {
   }
 });
 
-function showToast(message, icon = "person") {
+export function showToast(message, icon = "person") {
   const toast = document.getElementById("toast");
   const toastMessage = document.getElementById("toastMessage");
   const toastIcon = toast.querySelector(".toast-icon");
@@ -303,11 +291,10 @@ function showToast(message, icon = "person") {
   if (!toast || !toastMessage || !toastIcon) return;
 
   toastMessage.textContent = message;
-  toastIcon.textContent = icon; // material symbol name
+  toastIcon.textContent = icon;
 
   toast.classList.add("show");
 
-  // Hide after 3 seconds
   setTimeout(() => {
     toast.classList.remove("show");
   }, 3000);
@@ -329,14 +316,12 @@ signupForm.addEventListener("submit", (e) => {
   createAccount(username, password, email);
 });
 
-async function loadProfileFavorites() {
+export async function loadProfileFavorites() {
   const token = localStorage.getItem("token");
   const res = await fetch("http://localhost:5000/api/favorites", {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await res.json();
-
-  // ✅ Make sure renderFavorites is implemented
   renderFavorites(data.favorites);
 }
 
@@ -349,14 +334,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const cropArea = document.getElementById("cropArea");
   let cropper;
 
-  // Plus button → trigger file picker
   if (openBtn) {
     openBtn.addEventListener("click", () => {
       fileInput.click();
     });
   }
 
-  // When a file is chosen
   fileInput.addEventListener("change", () => {
     const file = fileInput.files[0];
     if (!file) return;
@@ -370,7 +353,6 @@ document.addEventListener("DOMContentLoaded", () => {
       cropArea.innerHTML = "";
       cropArea.appendChild(img);
 
-      console.log("Initializing cropper:", window.Cropper);
       cropper = new window.Cropper(img, {
         aspectRatio: 1,
         viewMode: 1,
@@ -379,7 +361,6 @@ document.addEventListener("DOMContentLoaded", () => {
         movable: true,
         zoomable: true,
       });
-      console.log("Cropper instance:", cropper);
     };
     reader.readAsDataURL(file);
   });
@@ -406,15 +387,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (saveBtn) {
     saveBtn.addEventListener("click", () => {
-      console.log("Cropper at save:", cropper);
       if (!cropper) {
         showToast("No image selected to crop", "error");
-        return;
-      }
-
-      // Ensure cropper is ready
-      if (!cropper.ready) {
-        showToast("Cropper not ready yet", "error");
         return;
       }
 
@@ -429,8 +403,6 @@ document.addEventListener("DOMContentLoaded", () => {
           showToast("Could not create image blob", "error");
           return;
         }
-
-        console.log("Blob created:", blob); // ✅ debug log
 
         const formData = new FormData();
         formData.append("avatar", blob, "avatar.png");

@@ -1,4 +1,8 @@
-function initMasonry(containerId) {
+import { fetchGifs } from "./api.js";
+import { userProfile, updateUI } from "./auth.js";
+import { displayFavorites } from "./favorites.js";
+
+export function initMasonry(containerId) {
   const container = document.getElementById(containerId);
   if (!container || typeof Masonry === "undefined") return;
 
@@ -21,23 +25,80 @@ function initMasonry(containerId) {
   return msnry;
 }
 
-// function showHomePage() {
-//   hideAllSections();
-//   clearSearchState();
-//   lastActiveSection = "home";
-//   localStorage.setItem("lastActiveSection", lastActiveSection); // ✅ persist
+function showHomePage() {
+  hideAllSections();
+  clearSearchState();
 
-//   const featureSection = document.getElementById("feature-section");
-//   if (featureSection) featureSection.style.display = "block";
+  const featureSection = document.getElementById("feature-section");
+  if (featureSection) featureSection.style.display = "block";
 
-//   // ✅ reload trending GIFs immediately when navigating Home
-//   fetchGifs("").then(async (data) => {
-//     const favorites = userProfile ? await getFavorites() : [];
-//     displayGifs(data.data, favorites, false, "");
-//   });
-// }
+  const searchBlock = document.querySelector(".search-block");
+  if (searchBlock) searchBlock.style.display = "block";
 
-async function getFavorites() {
+  const mainHeader = document.querySelector(".hero");
+  if (mainHeader) mainHeader.style.display = "block";
+
+  fetchGifs("").then(async (data) => {
+    const favorites = userProfile ? await getFavorites() : [];
+    displayGifs(data.data, favorites, false, "");
+  });
+}
+
+function showProfilePage() {
+  hideAllSections();
+  clearSearchState();
+
+  const profileSection = document.getElementById("profile");
+  if (profileSection) profileSection.style.display = "block";
+
+  // ✅ Show search + header again
+  const searchBlock = document.querySelector(".search-block");
+  if (searchBlock) searchBlock.style.display = "block";
+
+  const mainHeader = document.querySelector(".hero");
+  if (mainHeader) mainHeader.style.display = "block";
+
+  const resultsContainer = document.getElementById("profileSearchResults");
+  if (resultsContainer) resultsContainer.style.display = "none";
+
+  window.profileSearchState = { query: "", offset: 0, limit: 20 };
+}
+
+function showFavoritesPage() {
+  hideAllSections();
+  clearSearchState();
+
+  const favoritesSection = document.getElementById("favorites");
+  if (favoritesSection) favoritesSection.style.display = "block";
+
+  // ✅ Show search + header again
+  const searchBlock = document.querySelector(".search-block");
+  if (searchBlock) searchBlock.style.display = "block";
+
+  const mainHeader = document.querySelector(".hero");
+  if (mainHeader) mainHeader.style.display = "block";
+
+  if (typeof displayFavorites === "function") {
+    displayFavorites("favoritesGrid", true);
+  }
+}
+
+function showAboutPage() {
+  hideAllSections();
+  clearSearchState();
+
+  const aboutSection = document.getElementById("about");
+  if (aboutSection) aboutSection.style.display = "block";
+
+  // ✅ Hide search bar + main header
+  const searchBlock = document.querySelector(".search-block");
+  if (searchBlock) searchBlock.style.display = "none";
+
+  const mainHeader = document.querySelector(".hero");
+  if (mainHeader) mainHeader.style.display = "none";
+}
+
+export async function getFavorites() {
   const token = localStorage.getItem("token");
   if (!token || !userProfile) {
     return []; // ✅ return empty array if logged out
@@ -63,8 +124,7 @@ async function getFavorites() {
   }
 }
 
-function displayGifs(gifs, favorites, isSearch = false, query = "") {
-  lastDisplayedGifs = gifs;
+export function displayGifs(gifs, favorites, isSearch = false, query = "") {
   const featureHeader = document.querySelector(".feature-header");
 
   if (featureHeader) {
@@ -109,9 +169,7 @@ function displayGifs(gifs, favorites, isSearch = false, query = "") {
       const favButton = document.createElement("button");
       favButton.className = "fav-btn";
 
-      // ✅ Use favorites passed in as argument
       const isFavorited = favorites.some((fav) => fav.id === gif.id);
-
       favButton.textContent = isFavorited ? "❤️" : "🤍";
       if (isFavorited) favButton.classList.add("active");
 
@@ -123,11 +181,10 @@ function displayGifs(gifs, favorites, isSearch = false, query = "") {
     resultContainer.appendChild(gifWrapper);
   });
 
-  // Masonry refresh if used
   initMasonry("gifResults");
 }
 
-async function displayProfileSearchResults(gifs, favorites, query = "") {
+export async function displayProfileSearchResults(gifs, favorites, query = "") {
   lastDisplayedGifs = gifs;
   // reset state when new query
   if (query !== profileSearchState.query) {
@@ -236,8 +293,7 @@ async function displayProfileSearchResults(gifs, favorites, query = "") {
   initMasonry("profileGifResults");
 }
 
-// Hide all sections first
-function hideAllSections() {
+export function hideAllSections() {
   const feature = document.getElementById("feature-section");
   const profile = document.getElementById("profile");
   const favorites = document.getElementById("favorites");
@@ -254,3 +310,36 @@ function hideAllSections() {
   const favoritesGrid = document.getElementById("favoritesGrid");
   if (favoritesGrid) favoritesGrid.innerHTML = "";
 }
+
+// --- Clear only DOM, not main.js state ---
+function clearSearchState() {
+  const searchBar = document.getElementById("searchBar");
+  if (searchBar) searchBar.value = "";
+
+  const profileResults = document.getElementById("profileSearchResults");
+  if (profileResults) {
+    profileResults.style.display = "none";
+    profileResults.classList.remove("active");
+  }
+
+  const profileHeader = document.getElementById("profileFeatureHeader");
+  if (profileHeader) profileHeader.textContent = "Profile GIFs";
+
+  const favoritesHeader = document.getElementById("favoritesHeader");
+  if (favoritesHeader) favoritesHeader.textContent = "My Favorites";
+
+  const profileGrid = document.getElementById("profileGifResults");
+  if (profileGrid) profileGrid.innerHTML = "";
+  const favoritesGrid = document.getElementById("favoritesGrid");
+  if (favoritesGrid) favoritesGrid.innerHTML = "";
+  const gifResults = document.getElementById("gifResults");
+  if (gifResults) gifResults.innerHTML = "";
+}
+
+export {
+  showHomePage,
+  showProfilePage,
+  showFavoritesPage,
+  showAboutPage,
+  clearSearchState,
+};
