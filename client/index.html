@@ -22,14 +22,14 @@
       <div class="navdiv">
         <!-- Left: Logo -->
         <div class="navlogo">
-          <a href="#" onclick="showHomePage()">GifHub</a>
+          <a href="#" id="homeLink">GifHub</a>
         </div>
 
         <!-- Center: Desktop links -->
         <ul class="nav-links">
           <li class="navlist desktop-only"><a href="#">Forum</a></li>
           <li class="navlist desktop-only">
-            <a href="#" onclick="showAboutPage()">About</a>
+            <a href="#" id="aboutLink">About</a>
           </li>
         </ul>
 
@@ -42,7 +42,7 @@
             <span
               class="material-symbols-outlined mobile-only"
               title="About"
-              onclick="showAboutPage()"
+              id="aboutIcon"
               >info</span
             >
           </div>
@@ -66,10 +66,10 @@
             <span id="loginStatus" class="login-status">Guest</span>
             <div class="profile-dropdown" id="profileDropdown">
               <ul>
-                <li><a href="#" onclick="showProfilePage()">Profile</a></li>
-                <li><a href="#" onclick="showFavoritesPage()">Favorites</a></li>
+                <li><a href="#" id="profileLink">Profile</a></li>
+                <li><a href="#" id="favoritesLink">Favorites</a></li>
                 <hr class="dropdown-divider" />
-                <li><a href="#" onclick="logout()">Logout</a></li>
+                <li><a href="#" id="logoutLink">Logout</a></li>
               </ul>
             </div>
           </div>
@@ -255,7 +255,8 @@
       aria-describedby="modalSubtitle"
     >
       <div class="popup-content satire-theme">
-        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <span class="close-btn" id="closeModalBtn">&times;</span>
+
         <h2 id="modalTitle">Welcome to GIFhub</h2>
         <p class="subtitle" id="modalSubtitle">
           Log in or sign up to save your funniest finds
@@ -340,18 +341,8 @@
     <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
     <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
 
-    <!-- Core helpers first -->
-    <script src="js/api.js" defer></script>
-    <script src="js/ui.js" defer></script>
-
-    <!-- Favorites logic -->
-    <script src="js/favorites.js" defer></script>
-
-    <!-- Auth + updateUI -->
-    <script src="js/auth.js" defer></script>
-
     <!-- Main navigation -->
-    <script src="js/main.js" defer></script>
+    <script type="module" src="js/main.js"></script>
   </body>
   <footer class="site-footer">
     <div class="footer-container">
@@ -365,10 +356,10 @@
       <div class="footer-links">
         <h4>Explore</h4>
         <ul>
-          <li><a href="#" onclick="showHomePage()">Home</a></li>
-          <li><a href="#" onclick="showFavoritesPage()">Favorites</a></li>
-          <li><a href="#" onclick="showProfilePage()">Profile</a></li>
-          <li><a href="#" onclick="showAboutPage()">About</a></li>
+          <li><a href="#" id="footerHomeLink">GifHub</a></li>
+          <li><a href="#" id="footerFavoritesLink">Favorites</a></li>
+          <li><a href="#" id="footerProfileLink">Profile</a></li>
+          <li><a href="#" id="footerAboutLink">About</a></li>
         </ul>
       </div>
 

@@ -1,3 +1,62 @@
+import { fetchGifs, fetchSuggestions, debounce } from "./api.js";
+import {
+  displayGifs,
+  displayProfileSearchResults,
+  hideAllSections,
+  getFavorites,
+  showHomePage,
+  showProfilePage,
+  showFavoritesPage,
+  showAboutPage,
+  clearSearchState,
+} from "./ui.js";
+import { toggleFavorite, displayFavorites } from "./favorites.js";
+import {
+  login,
+  logout,
+  createAccount,
+  updateUI,
+  showToast,
+  openModal,
+  closeModal,
+  userProfile,
+} from "./auth.js";
+
+// Navbar + footer navigation
+document.addEventListener("DOMContentLoaded", () => {
+  const homeLink = document.getElementById("homeLink");
+  if (homeLink) homeLink.addEventListener("click", goHome);
+
+  const aboutLink = document.getElementById("aboutLink");
+  if (aboutLink) aboutLink.addEventListener("click", goAbout);
+
+  const profileLink = document.getElementById("profileLink");
+  if (profileLink) profileLink.addEventListener("click", goProfile);
+
+  const favoritesLink = document.getElementById("favoritesLink");
+  if (favoritesLink) favoritesLink.addEventListener("click", goFavorites);
+
+  // Footer links
+  const footerHomeLink = document.getElementById("footerHomeLink");
+  if (footerHomeLink) footerHomeLink.addEventListener("click", goHome);
+
+  const footerFavoritesLink = document.getElementById("footerFavoritesLink");
+  if (footerFavoritesLink)
+    footerFavoritesLink.addEventListener("click", goFavorites);
+
+  const footerProfileLink = document.getElementById("footerProfileLink");
+  if (footerProfileLink) footerProfileLink.addEventListener("click", goProfile);
+
+  const footerAboutLink = document.getElementById("footerAboutLink");
+  if (footerAboutLink) footerAboutLink.addEventListener("click", goAbout);
+
+  const aboutIcon = document.getElementById("aboutIcon");
+  if (aboutIcon) aboutIcon.addEventListener("click", goAbout);
+
+  const closeModalBtn = document.getElementById("closeModalBtn");
+  if (closeModalBtn) closeModalBtn.addEventListener("click", closeModal);
+});
+
 let lastDisplayedGifs = [];
 let infiniteScrollEnabled = false;
 let currentSearchQuery = "";
@@ -23,6 +82,51 @@ const authPopup = document.getElementById("auth-popup");
 const themeIcon = document.getElementById("themeIcon");
 const themeSwitch = document.getElementById("themeSwitch");
 
+// --- Navigation Wrappers ---
+// These wrap UI navigation functions and also reset state variables
+
+function goHome() {
+  showHomePage();
+  currentSearchQuery = "";
+  favoritesSearchActive = false;
+  isSubmittingSearch = false;
+  lastActiveSection = "home";
+  localStorage.setItem("lastActiveSection", lastActiveSection);
+}
+
+function goProfile() {
+  showProfilePage();
+  currentSearchQuery = "";
+  favoritesSearchActive = false;
+  isSubmittingSearch = false;
+  lastActiveSection = "profile";
+  localStorage.setItem("lastActiveSection", lastActiveSection);
+}
+
+function goFavorites() {
+  showFavoritesPage();
+  currentSearchQuery = "";
+  favoritesSearchActive = false;
+  isSubmittingSearch = false;
+  lastActiveSection = "favorites";
+  localStorage.setItem("lastActiveSection", lastActiveSection);
+
+  // ✅ Ensure header exists before search runs
+  const favoritesSection = document.getElementById("favorites");
+  if (favoritesSection && favoritesSection.style.display === "block") {
+    displayFavorites("favoritesGrid", true);
+  }
+}
+
+function goAbout() {
+  showAboutPage();
+  currentSearchQuery = "";
+  favoritesSearchActive = false;
+  isSubmittingSearch = false;
+  lastActiveSection = "about";
+  localStorage.setItem("lastActiveSection", lastActiveSection);
+}
+
 themeSwitch.addEventListener("change", () => {
   if (themeSwitch.checked) {
     document.body.classList.add("dark-mode");
@@ -44,40 +148,6 @@ if (savedTheme === "dark") {
 } else {
   themeSwitch.checked = false;
   themeIcon.textContent = "dark_mode";
-}
-
-// --- Search state helper ---
-function clearSearchState() {
-  // Clear global query and flags
-  currentSearchQuery = "";
-  favoritesSearchActive = false;
-  isSubmittingSearch = false;
-
-  // Clear search input UI
-  if (searchBar) searchBar.value = "";
-
-  // Hide profile search results UI
-  const profileResults = document.getElementById("profileSearchResults");
-  if (profileResults) {
-    profileResults.style.display = "none";
-    profileResults.classList.remove("active");
-  }
-
-  // Reset profile header
-  const profileHeader = document.getElementById("profileFeatureHeader");
-  if (profileHeader) profileHeader.textContent = "Profile GIFs";
-
-  // Reset favorites header
-  const favoritesHeader = document.getElementById("favoritesHeader");
-  if (favoritesHeader) favoritesHeader.textContent = "My Favorites";
-
-  // Clear result containers to avoid overlap
-  const profileGrid = document.getElementById("profileGifResults");
-  if (profileGrid) profileGrid.innerHTML = "";
-  const favoritesGrid = document.getElementById("favoritesGrid");
-  if (favoritesGrid) favoritesGrid.innerHTML = "";
-  const gifResults = document.getElementById("gifResults");
-  if (gifResults) gifResults.innerHTML = "";
 }
 
 async function loadMoreGifs(query) {
@@ -357,6 +427,9 @@ searchForm.addEventListener("submit", async (e) => {
   if (document.getElementById("favorites").style.display === "block") {
     // Clear other UI state but keep Favorites visible
     clearSearchState();
+    currentSearchQuery = "";
+    favoritesSearchActive = false;
+    isSubmittingSearch = false;
     favoritesSearchActive = true;
     currentSearchQuery = query;
     await displayFavoritesSearch(currentSearchQuery);
@@ -368,6 +441,9 @@ searchForm.addEventListener("submit", async (e) => {
   if (document.getElementById("profile").style.display === "block") {
     // Clear other UI state and hide profile dashboard elements
     clearSearchState();
+    currentSearchQuery = "";
+    favoritesSearchActive = false;
+    isSubmittingSearch = false;
     currentSearchQuery = query;
 
     // Hide profile dashboard so only search results are visible
@@ -397,6 +473,9 @@ searchForm.addEventListener("submit", async (e) => {
 
   // --- Home / Feature search ---
   clearSearchState();
+  currentSearchQuery = "";
+  favoritesSearchActive = false;
+  isSubmittingSearch = false;
   currentSearchQuery = query;
   const data = await fetchGifs(currentSearchQuery);
   const favorites = userProfile ? await getFavorites() : [];
@@ -423,9 +502,14 @@ async function displayFavoritesSearch(query, offset = 0, limit = 20) {
     favorites = await getFavorites();
   }
 
-  // ✅ Update Favorites header to show search query
+  // ✅ Update Favorites header safely
+  const favoritesSection = document.getElementById("favorites");
   const favoritesHeader = document.getElementById("favoritesHeader");
-  if (favoritesHeader) {
+  if (
+    favoritesSection &&
+    favoritesSection.style.display === "block" &&
+    favoritesHeader
+  ) {
     favoritesHeader.textContent = query
       ? `Search Results for ${query}`
       : "My Favorites";
@@ -468,93 +552,3 @@ window.addEventListener("resize", () => {
   initMasonry("profileGifResults");
   initMasonry("favoritesGrid");
 });
-
-function showProfilePage() {
-  hideAllSections();
-  clearSearchState();
-  lastActiveSection = "profile";
-  localStorage.setItem("lastActiveSection", lastActiveSection);
-
-  const profileSection = document.getElementById("profile");
-  if (profileSection) profileSection.style.display = "block";
-
-  // ✅ Show search + header again
-  const searchBlock = document.querySelector(".search-block");
-  if (searchBlock) searchBlock.style.display = "block";
-
-  const mainHeader = document.querySelector(".hero");
-  if (mainHeader) mainHeader.style.display = "block";
-
-  const resultsContainer = document.getElementById("profileSearchResults");
-  if (resultsContainer) resultsContainer.style.display = "none";
-
-  window.profileSearchState = { query: "", offset: 0, limit: 20 };
-}
-
-function showFavoritesPage() {
-  hideAllSections();
-  clearSearchState();
-  lastActiveSection = "favorites";
-  localStorage.setItem("lastActiveSection", lastActiveSection);
-
-  const favoritesSection = document.getElementById("favorites");
-  if (favoritesSection) favoritesSection.style.display = "block";
-
-  // ✅ Show search + header again
-  const searchBlock = document.querySelector(".search-block");
-  if (searchBlock) searchBlock.style.display = "block";
-
-  const mainHeader = document.querySelector(".hero");
-  if (mainHeader) mainHeader.style.display = "block";
-
-  if (typeof displayFavorites === "function") {
-    displayFavorites("favoritesGrid", true);
-  }
-}
-
-function showHomePage() {
-  hideAllSections();
-  clearSearchState();
-  lastActiveSection = "home";
-  localStorage.setItem("lastActiveSection", lastActiveSection);
-
-  const featureSection = document.getElementById("feature-section");
-  if (featureSection) featureSection.style.display = "block";
-
-  // ✅ Show search + header again
-  const searchBlock = document.querySelector(".search-block");
-  if (searchBlock) searchBlock.style.display = "block";
-
-  const mainHeader = document.querySelector(".hero");
-  if (mainHeader) mainHeader.style.display = "block";
-
-  // reload trending GIFs immediately when navigating Home
-  fetchGifs("").then(async (data) => {
-    const favorites = userProfile ? await getFavorites() : [];
-    displayGifs(data.data, favorites, false, "");
-  });
-}
-
-function showAboutPage() {
-  hideAllSections();
-  clearSearchState();
-  lastActiveSection = "about";
-  localStorage.setItem("lastActiveSection", lastActiveSection);
-
-  const aboutSection = document.getElementById("about");
-  if (aboutSection) aboutSection.style.display = "block";
-
-  // ✅ Hide search bar + main header
-  const searchBlock = document.querySelector(".search-block");
-  if (searchBlock) searchBlock.style.display = "none";
-
-  const mainHeader = document.querySelector(".hero");
-  if (mainHeader) mainHeader.style.display = "none";
-}
-
-window.showAboutPage = showAboutPage;
-
-// ✅ Expose globally so HTML onclick works
-window.showProfilePage = showProfilePage;
-window.showFavoritesPage = showFavoritesPage;
-window.showHomePage = showHomePage;
