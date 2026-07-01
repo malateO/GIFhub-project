@@ -1,3 +1,12 @@
+import { userProfile, showToast } from "./auth.js";
+import {
+  initMasonry,
+  getFavorites,
+  displayProfileSearchResults,
+  displayGifs,
+  displayFavoritesSearch,
+} from "./ui.js";
+
 let favoritesState = {
   offset: 0,
   limit: 20,

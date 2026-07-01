@@ -3,7 +3,10 @@ import {
   showHomePage,
   showProfilePage,
   showFavoritesPage,
+  displayGifs,
 } from "./ui.js";
+import { resetSearchState } from "./main.js";
+import { fetchGifs } from "./api.js";
 
 export let userProfile = null;
 
@@ -71,8 +74,7 @@ export async function login(identifier, password) {
 
       document.getElementById("loginUsername").value = "";
       document.getElementById("loginPassword").value = "";
-      searchBar.value = "";
-      currentSearchQuery = "";
+      resetSearchState(); // ✅ clears search state safely
     } else {
       alert(data.error || "Login failed");
     }
@@ -82,18 +84,10 @@ export async function login(identifier, password) {
 }
 
 export function logout() {
-  localStorage.clear();
   userProfile = null;
-  currentSearchQuery = "";
-  searchBar.value = "";
-  profileSearchState = { query: "", offset: 0, limit: 20 };
-  lastDisplayedGifs = [];
-  infiniteScrollEnabled = false;
+  resetSearchState(); // ✅ clears search state safely
 
   hideAllSections();
-
-  const suggestionsContainer = document.getElementById("searchSuggestions");
-  if (suggestionsContainer) suggestionsContainer.innerHTML = "";
 
   updateUI();
 
@@ -322,7 +316,9 @@ export async function loadProfileFavorites() {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await res.json();
-  renderFavorites(data.favorites);
+
+  // Use displayFavorites instead of undefined renderFavorites
+  displayFavorites("favoritesGrid", true);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
