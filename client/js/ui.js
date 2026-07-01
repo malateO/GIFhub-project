@@ -1,6 +1,6 @@
 import { fetchGifs } from "./api.js";
-import { userProfile, updateUI } from "./auth.js";
-import { displayFavorites } from "./favorites.js";
+import { userProfile, updateUI, showToast } from "./auth.js";
+import { displayFavorites, toggleFavorite } from "./favorites.js";
 
 export function initMasonry(containerId) {
   const container = document.getElementById(containerId);
@@ -193,8 +193,9 @@ export async function displayProfileSearchResults(gifs, favorites, query = "") {
   }
 
   const header = document.getElementById("profileFeatureHeader");
-  if (header)
+  if (header) {
     header.textContent = query ? `Search Results for ${query}` : "Profile GIFs";
+  }
 
   const grid = document.getElementById("profileGifResults");
   const loadMoreBtn = document.getElementById("profileLoadMoreBtn");
@@ -326,14 +327,71 @@ function clearSearchState() {
   if (profileHeader) profileHeader.textContent = "Profile GIFs";
 
   const favoritesHeader = document.getElementById("favoritesHeader");
-  if (favoritesHeader) favoritesHeader.textContent = "My Favorites";
+  if (
+    favoritesHeader &&
+    document.getElementById("favorites").style.display !== "block"
+  ) {
+    favoritesHeader.textContent = "My Favorites";
+  }
 
   const profileGrid = document.getElementById("profileGifResults");
   if (profileGrid) profileGrid.innerHTML = "";
+
   const favoritesGrid = document.getElementById("favoritesGrid");
   if (favoritesGrid) favoritesGrid.innerHTML = "";
+
   const gifResults = document.getElementById("gifResults");
   if (gifResults) gifResults.innerHTML = "";
+}
+
+async function displayFavoritesSearch(query, offset = 0, limit = 20) {
+  const data = await fetchGifs(query, offset, limit);
+  let favorites = [];
+  if (userProfile) {
+    favorites = await getFavorites();
+  }
+
+  const favoritesHeader = document.getElementById("favoritesHeader");
+  if (favoritesHeader) {
+    favoritesHeader.textContent = query
+      ? `Search Results for ${query}`
+      : "My Favorites";
+  }
+
+  const favoritesGrid = document.getElementById("favoritesGrid");
+  if (favoritesGrid) {
+    favoritesGrid.innerHTML = "";
+    data.data.forEach((gif) => {
+      const imgUrl =
+        gif.images?.fixed_height?.url ||
+        gif.images?.downsized?.url ||
+        gif.images?.original?.url;
+
+      if (!imgUrl) return; // skip broken GIFs
+
+      const gifWrapper = document.createElement("div");
+      gifWrapper.className = "gif-item";
+
+      const img = document.createElement("img");
+      img.src = imgUrl;
+      img.alt = gif.title || "GIF";
+
+      if (userProfile) {
+        const favButton = document.createElement("button");
+        favButton.className = "fav-btn";
+        const isFavorited = favorites.some((fav) => fav.id === gif.id);
+        favButton.textContent = isFavorited ? "❤️" : "🤍";
+        if (isFavorited) favButton.classList.add("active");
+        favButton.addEventListener("click", () => toggleFavorite(gif));
+        gifWrapper.appendChild(favButton);
+      }
+
+      gifWrapper.appendChild(img);
+      favoritesGrid.appendChild(gifWrapper);
+    });
+
+    initMasonry("favoritesGrid");
+  }
 }
 
 export {
@@ -342,4 +400,5 @@ export {
   showFavoritesPage,
   showAboutPage,
   clearSearchState,
+  displayFavoritesSearch,
 };

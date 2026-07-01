@@ -9,6 +9,7 @@ import {
   showFavoritesPage,
   showAboutPage,
   clearSearchState,
+  displayFavoritesSearch,
 } from "./ui.js";
 import { toggleFavorite, displayFavorites } from "./favorites.js";
 import {
@@ -104,17 +105,30 @@ function goProfile() {
 }
 
 function goFavorites() {
+  // Show the Favorites section first
   showFavoritesPage();
-  currentSearchQuery = "";
+
+  // Reset state but keep currentSearchQuery intact
   favoritesSearchActive = false;
   isSubmittingSearch = false;
   lastActiveSection = "favorites";
   localStorage.setItem("lastActiveSection", lastActiveSection);
 
-  // ✅ Ensure header exists before search runs
+  // ✅ Now that the section is visible, safely call displayFavorites
   const favoritesSection = document.getElementById("favorites");
   if (favoritesSection && favoritesSection.style.display === "block") {
-    displayFavorites("favoritesGrid", true);
+    const favoritesHeader = document.getElementById("favoritesHeader");
+    if (favoritesHeader) {
+      favoritesHeader.textContent = currentSearchQuery
+        ? `Search Results for ${currentSearchQuery}`
+        : "My Favorites";
+    }
+
+    if (currentSearchQuery) {
+      displayFavoritesSearch(currentSearchQuery); // run search only after visible
+    } else {
+      displayFavorites("favoritesGrid", true);
+    }
   }
 }
 
@@ -143,11 +157,11 @@ themeSwitch.addEventListener("change", () => {
 const savedTheme = localStorage.getItem("theme");
 if (savedTheme === "dark") {
   document.body.classList.add("dark-mode");
-  themeSwitch.checked = true;
-  themeIcon.textContent = "light_mode";
+  if (themeSwitch) themeSwitch.checked = true;
+  if (themeIcon) themeIcon.textContent = "light_mode";
 } else {
-  themeSwitch.checked = false;
-  themeIcon.textContent = "dark_mode";
+  if (themeSwitch) themeSwitch.checked = false;
+  if (themeIcon) themeIcon.textContent = "dark_mode";
 }
 
 async function loadMoreGifs(query) {
@@ -291,57 +305,6 @@ searchBar.addEventListener("keydown", (e) => {
   }
 });
 
-// debounced input handler for suggestions
-// searchBar.addEventListener(
-//   "input",
-//   debounce(async (event) => {
-//     const query = event.target.value.trim();
-//     if (!suggestionsContainer) return;
-//     suggestionsContainer.innerHTML = "";
-
-//     if (!query) {
-//       favoritesSearchActive = false; // ✅ reset when query is cleared
-//       // ✅ Restore Profile dashboard when search is cleared
-//       if (userProfile && userProfile.username) {
-//         const profileHeader = document.querySelector(".profile-header");
-//         const profileDashboardText = document.getElementById(
-//           "profileDashboardText",
-//         );
-//         const profileSubheader = document.querySelector(".profile-subheader");
-//         const resultsContainer = document.getElementById(
-//           "profileSearchResults",
-//         );
-
-//         if (profileHeader) profileHeader.style.display = "flex";
-//         if (profileDashboardText) profileDashboardText.style.display = "block";
-//         if (profileSubheader) profileSubheader.style.display = "block";
-//         if (resultsContainer) resultsContainer.style.display = "none";
-//       }
-
-//       return; // stop here, don’t fetch suggestions
-//     }
-
-//     try {
-//       const suggestions = await fetchSuggestions(query);
-//       suggestions.forEach((s) => {
-//         const suggestionItem = document.createElement("div");
-//         suggestionItem.className = "suggestion-item";
-//         suggestionItem.textContent = s;
-
-//         suggestionItem.addEventListener("click", () => {
-//           searchBar.value = s;
-//           suggestionsContainer.innerHTML = "";
-//           searchForm.requestSubmit();
-//         });
-
-//         suggestionsContainer.appendChild(suggestionItem);
-//       });
-//     } catch (err) {
-//       console.error("Suggestion fetch failed", err);
-//     }
-//   }, 500),
-// );
-
 window.addEventListener("keydown", (e) => {
   console.log("key pressed", e.key);
   if (authPopup.classList.contains("show")) {
@@ -399,17 +362,6 @@ loadMoreBtn.addEventListener("click", async () => {
   }
 });
 
-// Initial load of GIFs based on saved section
-// const savedSection = localStorage.getItem("lastActiveSection") || "home";
-
-// if (savedSection === "home") {
-//   fetchGifs("").then(async (data) => {
-//     const favorites = userProfile ? await getFavorites() : [];
-//     displayGifs(data.data, favorites, false, "");
-//   });
-// }
-// ✅ For profile/favorites, let updateUI() handle the correct fetch.
-
 // Search form submit handler
 searchForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -425,13 +377,15 @@ searchForm.addEventListener("submit", async (e) => {
 
   // --- Favorites page search ---
   if (document.getElementById("favorites").style.display === "block") {
-    // Clear other UI state but keep Favorites visible
-    clearSearchState();
-    currentSearchQuery = "";
-    favoritesSearchActive = false;
-    isSubmittingSearch = false;
+    showFavoritesPage(); // ✅ make section visible first
     favoritesSearchActive = true;
     currentSearchQuery = query;
+
+    const favoritesHeader = document.getElementById("favoritesHeader");
+    if (favoritesHeader) {
+      favoritesHeader.textContent = `Search Results for ${query}`;
+    }
+
     await displayFavoritesSearch(currentSearchQuery);
     isSubmittingSearch = false;
     return;
@@ -439,48 +393,28 @@ searchForm.addEventListener("submit", async (e) => {
 
   // --- Profile page search ---
   if (document.getElementById("profile").style.display === "block") {
-    // Clear other UI state and hide profile dashboard elements
-    clearSearchState();
-    currentSearchQuery = "";
+    showProfilePage(); // ✅ make section visible first
     favoritesSearchActive = false;
-    isSubmittingSearch = false;
     currentSearchQuery = query;
 
-    // Hide profile dashboard so only search results are visible
-    const profileHeader = document.querySelector(".profile-header");
-    const profileDashboardText = document.getElementById(
-      "profileDashboardText",
-    );
-    const profileSubheader = document.querySelector(".profile-subheader");
-    const resultsContainer = document.getElementById("profileSearchResults");
-    if (profileHeader) profileHeader.style.display = "none";
-    if (profileDashboardText) profileDashboardText.style.display = "none";
-    if (profileSubheader) profileSubheader.style.display = "none";
-
-    // Show results container and run the search
-    if (resultsContainer) {
-      resultsContainer.style.display = "block";
-      resultsContainer.classList.add("active");
+    const profileHeader = document.getElementById("profileFeatureHeader");
+    if (profileHeader) {
+      profileHeader.textContent = `Search Results for ${query}`;
     }
 
-    const data = await fetchGifs(currentSearchQuery);
+    const data = await fetchGifs(query);
     const favorites = userProfile ? await getFavorites() : [];
-    displayProfileSearchResults(data.data, favorites, currentSearchQuery);
+    displayProfileSearchResults(data.data, favorites, query);
 
     isSubmittingSearch = false;
     return;
   }
 
-  // --- Home / Feature search ---
-  clearSearchState();
-  currentSearchQuery = "";
-  favoritesSearchActive = false;
-  isSubmittingSearch = false;
+  // --- Home page search ---
+  showHomePage(); // ✅ make section visible first
   currentSearchQuery = query;
   const data = await fetchGifs(currentSearchQuery);
   const favorites = userProfile ? await getFavorites() : [];
-  const featureSection = document.getElementById("feature-section");
-  if (featureSection) featureSection.style.display = "block";
   displayGifs(data.data, favorites, true, currentSearchQuery);
 
   isSubmittingSearch = false;
@@ -495,60 +429,23 @@ if (profileResults) {
 const gifResults = document.getElementById("gifResults");
 if (gifResults) gifResults.innerHTML = "";
 
-async function displayFavoritesSearch(query, offset = 0, limit = 20) {
-  const data = await fetchGifs(query, offset, limit);
-  let favorites = [];
-  if (userProfile) {
-    favorites = await getFavorites();
-  }
-
-  // ✅ Update Favorites header safely
-  const favoritesSection = document.getElementById("favorites");
-  const favoritesHeader = document.getElementById("favoritesHeader");
-  if (
-    favoritesSection &&
-    favoritesSection.style.display === "block" &&
-    favoritesHeader
-  ) {
-    favoritesHeader.textContent = query
-      ? `Search Results for ${query}`
-      : "My Favorites";
-  }
-
-  const favoritesGrid = document.getElementById("favoritesGrid");
-  if (favoritesGrid) {
-    favoritesGrid.innerHTML = "";
-    data.data.forEach((gif) => {
-      const gifWrapper = document.createElement("div");
-      gifWrapper.className = "gif-item";
-
-      const img = document.createElement("img");
-      img.src =
-        gif.images?.fixed_height?.url ||
-        gif.images?.downsized?.url ||
-        gif.images?.original?.url;
-      img.alt = gif.title || "GIF";
-
-      if (userProfile) {
-        const favButton = document.createElement("button");
-        favButton.className = "fav-btn";
-        const isFavorited = favorites.some((fav) => fav.id === gif.id);
-        favButton.textContent = isFavorited ? "❤️" : "🤍";
-        if (isFavorited) favButton.classList.add("active");
-        favButton.addEventListener("click", () => toggleFavorite(gif));
-        gifWrapper.appendChild(favButton);
-      }
-
-      gifWrapper.appendChild(img);
-      favoritesGrid.appendChild(gifWrapper);
-    });
-
-    initMasonry("favoritesGrid");
-  }
-}
-
 window.addEventListener("resize", () => {
   initMasonry("gifResults");
   initMasonry("profileGifResults");
   initMasonry("favoritesGrid");
 });
+
+// main.js
+export function resetSearchState() {
+  currentSearchQuery = "";
+  favoritesSearchActive = false;
+  isSubmittingSearch = false;
+  lastDisplayedGifs = [];
+  infiniteScrollEnabled = false;
+
+  const searchBar = document.getElementById("searchBar");
+  if (searchBar) searchBar.value = "";
+
+  const suggestionsContainer = document.getElementById("searchSuggestions");
+  if (suggestionsContainer) suggestionsContainer.innerHTML = "";
+}
