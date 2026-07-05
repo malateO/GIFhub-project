@@ -1,9 +1,3 @@
-// const fetch = require("node-fetch");
-// const express = require("express");
-// const router = express.Router();
-// const authenticateToken = require("../middleware/authMiddleware");
-// const User = require("../models/User");
-
 import express from "express";
 import fetch from "node-fetch";
 import authenticateToken from "../middleware/authMiddleware.js";

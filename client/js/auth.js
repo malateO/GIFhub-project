@@ -415,11 +415,29 @@ document.addEventListener("DOMContentLoaded", () => {
               showToast("Upload failed: " + data.error, "error");
               return;
             }
+
+            // ✅ Update userProfile object
+            if (userProfile) {
+              userProfile.profileImage = data.profileImage;
+            }
+
+            // ✅ Update DOM immediately
+            const profileImg = document.getElementById("profileImage");
+            if (profileImg) {
+              profileImg.src = data.profileImage;
+            }
             document.querySelector(".profile-avatar").src = data.profileImage;
-            userProfile.profileImage = data.profileImage;
+
+            // ✅ Close modal
             document.getElementById("avatarModal").classList.remove("show");
+
+            // ✅ Refresh into Profile page instead of Home
+            showProfilePage();
+            updateUI();
+
             showToast("Profile image updated!", "person");
           })
+
           .catch((err) => {
             console.error("Upload error:", err);
             showToast("Upload failed", "error");

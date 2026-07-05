@@ -6,6 +6,11 @@ import {
   displayGifs,
   displayFavoritesSearch,
 } from "./ui.js";
+import {
+  lastDisplayedGifs,
+  currentSearchQuery,
+  favoritesSearchActive,
+} from "./state.js";
 
 let favoritesState = {
   offset: 0,
@@ -26,7 +31,7 @@ export async function toggleFavorite(gif) {
       method: "DELETE",
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
-    showToast("Removed from Favorites", "cancel"); // ❌ icon for remove
+    showToast("Removed from Favorites", "cancel");
   } else {
     await fetch("http://localhost:5000/api/favorites", {
       method: "POST",
@@ -40,32 +45,10 @@ export async function toggleFavorite(gif) {
         images: gif.images,
       }),
     });
-    showToast("Added to Favorites", "favorite"); // ❤️ icon for add
+    showToast("Added to Favorites", "favorite");
   }
 
-  const newFavorites = await getFavorites();
-
-  // Refresh whichever view is active
-  if (document.getElementById("favorites").style.display === "block") {
-    if (favoritesSearchActive) {
-      displayFavoritesSearch(currentSearchQuery);
-    } else {
-      displayFavorites("favoritesGrid", true);
-    }
-  } else if (document.getElementById("profile").style.display === "block") {
-    displayProfileSearchResults(
-      lastDisplayedGifs,
-      newFavorites,
-      currentSearchQuery,
-    );
-  } else {
-    displayGifs(
-      lastDisplayedGifs,
-      newFavorites,
-      !!currentSearchQuery,
-      currentSearchQuery,
-    );
-  }
+  // ✅ No full grid refresh here — let the button handler flip the heart
 }
 
 export async function displayFavorites(containerId, reset = true) {
@@ -123,7 +106,15 @@ export async function displayFavorites(containerId, reset = true) {
 
     favButton.addEventListener("click", async () => {
       await toggleFavorite(gif);
-      displayFavorites(containerId, true); // ✅ refresh after toggle
+
+      // Flip the button instantly
+      if (favButton.classList.contains("active")) {
+        favButton.classList.remove("active");
+        favButton.textContent = "🤍";
+      } else {
+        favButton.classList.add("active");
+        favButton.textContent = "❤️";
+      }
     });
 
     gifWrapper.appendChild(img);
