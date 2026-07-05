@@ -61,6 +61,12 @@ function showProfilePage() {
   const resultsContainer = document.getElementById("profileSearchResults");
   if (resultsContainer) resultsContainer.style.display = "none";
 
+  // ✅ Refresh profile image if userProfile has one
+  const profileImg = document.getElementById("profileImage");
+  if (profileImg && userProfile?.profileImage) {
+    profileImg.src = userProfile.profileImage;
+  }
+
   window.profileSearchState = { query: "", offset: 0, limit: 20 };
 }
 
@@ -173,7 +179,19 @@ export function displayGifs(gifs, favorites, isSearch = false, query = "") {
       favButton.textContent = isFavorited ? "❤️" : "🤍";
       if (isFavorited) favButton.classList.add("active");
 
-      favButton.addEventListener("click", () => toggleFavorite(gif));
+      favButton.addEventListener("click", async () => {
+        await toggleFavorite(gif);
+
+        // Flip the button instantly
+        if (favButton.classList.contains("active")) {
+          favButton.classList.remove("active");
+          favButton.textContent = "🤍";
+        } else {
+          favButton.classList.add("active");
+          favButton.textContent = "❤️";
+        }
+      });
+
       gifWrapper.appendChild(favButton);
     }
 
@@ -382,7 +400,19 @@ async function displayFavoritesSearch(query, offset = 0, limit = 20) {
         const isFavorited = favorites.some((fav) => fav.id === gif.id);
         favButton.textContent = isFavorited ? "❤️" : "🤍";
         if (isFavorited) favButton.classList.add("active");
-        favButton.addEventListener("click", () => toggleFavorite(gif));
+        favButton.addEventListener("click", async () => {
+          await toggleFavorite(gif);
+
+          // Flip the button instantly
+          if (favButton.classList.contains("active")) {
+            favButton.classList.remove("active");
+            favButton.textContent = "🤍";
+          } else {
+            favButton.classList.add("active");
+            favButton.textContent = "❤️";
+          }
+        });
+
         gifWrapper.appendChild(favButton);
       }
 

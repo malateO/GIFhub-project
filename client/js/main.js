@@ -10,6 +10,7 @@ import {
   showAboutPage,
   clearSearchState,
   displayFavoritesSearch,
+  initMasonry,
 } from "./ui.js";
 import { toggleFavorite, displayFavorites } from "./favorites.js";
 import {
@@ -22,6 +23,14 @@ import {
   closeModal,
   userProfile,
 } from "./auth.js";
+import {
+  lastDisplayedGifs,
+  currentSearchQuery,
+  favoritesSearchActive,
+  setLastDisplayedGifs,
+  setCurrentSearchQuery,
+  setFavoritesSearchActive,
+} from "./state.js";
 
 // Navbar + footer navigation
 document.addEventListener("DOMContentLoaded", () => {
@@ -58,10 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (closeModalBtn) closeModalBtn.addEventListener("click", closeModal);
 });
 
-let lastDisplayedGifs = [];
 let infiniteScrollEnabled = false;
-let currentSearchQuery = "";
-let favoritesSearchActive = false;
 let isLoadingMore = false; // ✅ prevent duplicate fetches
 let isSubmittingSearch = false;
 let lastActiveSection = "home"; // can be "home", "profile", or "favorites"
@@ -88,8 +94,8 @@ const themeSwitch = document.getElementById("themeSwitch");
 
 function goHome() {
   showHomePage();
-  currentSearchQuery = "";
-  favoritesSearchActive = false;
+  setCurrentSearchQuery("");
+  setFavoritesSearchActive(false);
   isSubmittingSearch = false;
   lastActiveSection = "home";
   localStorage.setItem("lastActiveSection", lastActiveSection);
@@ -97,8 +103,8 @@ function goHome() {
 
 function goProfile() {
   showProfilePage();
-  currentSearchQuery = "";
-  favoritesSearchActive = false;
+  setCurrentSearchQuery("");
+  setFavoritesSearchActive(false);
   isSubmittingSearch = false;
   lastActiveSection = "profile";
   localStorage.setItem("lastActiveSection", lastActiveSection);
@@ -109,7 +115,7 @@ function goFavorites() {
   showFavoritesPage();
 
   // Reset state but keep currentSearchQuery intact
-  favoritesSearchActive = false;
+  setFavoritesSearchActive(false);
   isSubmittingSearch = false;
   lastActiveSection = "favorites";
   localStorage.setItem("lastActiveSection", lastActiveSection);
@@ -134,8 +140,8 @@ function goFavorites() {
 
 function goAbout() {
   showAboutPage();
-  currentSearchQuery = "";
-  favoritesSearchActive = false;
+  setCurrentSearchQuery("");
+  setFavoritesSearchActive(false);
   isSubmittingSearch = false;
   lastActiveSection = "about";
   localStorage.setItem("lastActiveSection", lastActiveSection);
@@ -166,16 +172,24 @@ if (savedTheme === "dark") {
 
 async function loadMoreGifs(query) {
   try {
-    const data = await fetchGifs(query, lastDisplayedGifs.length, 20); // ✅ use offset
+    // Fetch next batch of GIFs using offset
+    const data = await fetchGifs(query, lastDisplayedGifs.length, 20);
     if (!data.data || data.data.length === 0) {
       return false; // ✅ signal no more results
     }
 
+    // Update shared state
+    setLastDisplayedGifs([...lastDisplayedGifs, ...data.data]);
+    setCurrentSearchQuery(query);
+
+    // Get favorites if logged in
     let favorites = [];
     if (userProfile) {
       favorites = await getFavorites();
     }
-    displayGifs([...lastDisplayedGifs, ...data.data], favorites);
+
+    // Display updated GIFs
+    displayGifs(lastDisplayedGifs, favorites);
     return true;
   } catch (error) {
     console.error("GIF fetch failed", error);
