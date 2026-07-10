@@ -1,6 +1,7 @@
 import { fetchGifs } from "./api.js";
 import { userProfile, updateUI, showToast } from "./auth.js";
 import { displayFavorites, toggleFavorite } from "./favorites.js";
+import { setLastDisplayedGifs } from "./state.js";
 
 export function initMasonry(containerId) {
   const container = document.getElementById(containerId);
@@ -203,7 +204,7 @@ export function displayGifs(gifs, favorites, isSearch = false, query = "") {
 }
 
 export async function displayProfileSearchResults(gifs, favorites, query = "") {
-  lastDisplayedGifs = gifs;
+  setLastDisplayedGifs(gifs);
   // reset state when new query
   if (query !== profileSearchState.query) {
     profileSearchState.query = query;
@@ -273,6 +274,12 @@ export async function displayProfileSearchResults(gifs, favorites, query = "") {
     grid.appendChild(gifWrapper);
   });
 
+  const resultsContainer = document.getElementById("profileSearchResults");
+  if (resultsContainer) {
+    resultsContainer.style.display = "block";
+    resultsContainer.classList.add("active");
+  }
+
   // Show Load More if we got a full page
   if (gifs.length >= profileSearchState.limit) {
     loadMoreBtn.style.display = "block";
@@ -335,6 +342,7 @@ function clearSearchState() {
   const searchBar = document.getElementById("searchBar");
   if (searchBar) searchBar.value = "";
 
+  // Reset Profile search results
   const profileResults = document.getElementById("profileSearchResults");
   if (profileResults) {
     profileResults.style.display = "none";
@@ -344,14 +352,15 @@ function clearSearchState() {
   const profileHeader = document.getElementById("profileFeatureHeader");
   if (profileHeader) profileHeader.textContent = "Profile GIFs";
 
+  // ✅ Always reset Favorites header
   const favoritesHeader = document.getElementById("favoritesHeader");
-  if (
-    favoritesHeader &&
-    document.getElementById("favorites").style.display !== "block"
-  ) {
-    favoritesHeader.textContent = "My Favorites";
-  }
+  if (favoritesHeader) favoritesHeader.textContent = "My Favorites";
 
+  // ✅ Always reset Home header
+  const featureHeader = document.querySelector(".feature-header");
+  if (featureHeader) featureHeader.textContent = "Feature GIFs";
+
+  // Clear grids
   const profileGrid = document.getElementById("profileGifResults");
   if (profileGrid) profileGrid.innerHTML = "";
 
