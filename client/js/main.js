@@ -99,6 +99,10 @@ function goHome() {
   isSubmittingSearch = false;
   lastActiveSection = "home";
   localStorage.setItem("lastActiveSection", lastActiveSection);
+
+  // ✅ Clear other sections
+  document.getElementById("profileGifResults").innerHTML = "";
+  document.getElementById("favoritesGrid").innerHTML = "";
 }
 
 function goProfile() {
@@ -108,34 +112,31 @@ function goProfile() {
   isSubmittingSearch = false;
   lastActiveSection = "profile";
   localStorage.setItem("lastActiveSection", lastActiveSection);
+
+  // ✅ Clear other sections
+  document.getElementById("gifResults").innerHTML = "";
+  document.getElementById("favoritesGrid").innerHTML = "";
 }
 
 function goFavorites() {
   // Show the Favorites section first
   showFavoritesPage();
 
-  // Reset state but keep currentSearchQuery intact
+  // Reset state completely
+  setCurrentSearchQuery(""); // ✅ clear query
   setFavoritesSearchActive(false);
   isSubmittingSearch = false;
   lastActiveSection = "favorites";
   localStorage.setItem("lastActiveSection", lastActiveSection);
 
-  // ✅ Now that the section is visible, safely call displayFavorites
-  const favoritesSection = document.getElementById("favorites");
-  if (favoritesSection && favoritesSection.style.display === "block") {
-    const favoritesHeader = document.getElementById("favoritesHeader");
-    if (favoritesHeader) {
-      favoritesHeader.textContent = currentSearchQuery
-        ? `Search Results for ${currentSearchQuery}`
-        : "My Favorites";
-    }
-
-    if (currentSearchQuery) {
-      displayFavoritesSearch(currentSearchQuery); // run search only after visible
-    } else {
-      displayFavorites("favoritesGrid", true);
-    }
+  // ✅ Reset header
+  const favoritesHeader = document.getElementById("favoritesHeader");
+  if (favoritesHeader) {
+    favoritesHeader.textContent = "My Favorites";
   }
+
+  // ✅ Always show default favorites
+  displayFavorites("favoritesGrid", true);
 }
 
 function goAbout() {
@@ -261,7 +262,7 @@ searchBar.addEventListener(
     if (!query) {
       // If on Favorites page, show default favorites
       if (document.getElementById("favorites").style.display === "block") {
-        favoritesSearchActive = false;
+        setFavoritesSearchActive(false);
         displayFavorites("favoritesGrid", true);
       } else if (document.getElementById("profile").style.display === "block") {
         // On profile page, hide search results and show dashboard
@@ -392,8 +393,8 @@ searchForm.addEventListener("submit", async (e) => {
   // --- Favorites page search ---
   if (document.getElementById("favorites").style.display === "block") {
     showFavoritesPage(); // ✅ make section visible first
-    favoritesSearchActive = true;
-    currentSearchQuery = query;
+    setFavoritesSearchActive(true);
+    setCurrentSearchQuery(query);
 
     const favoritesHeader = document.getElementById("favoritesHeader");
     if (favoritesHeader) {
@@ -407,9 +408,8 @@ searchForm.addEventListener("submit", async (e) => {
 
   // --- Profile page search ---
   if (document.getElementById("profile").style.display === "block") {
-    showProfilePage(); // ✅ make section visible first
-    favoritesSearchActive = false;
-    currentSearchQuery = query;
+    setFavoritesSearchActive(false);
+    setCurrentSearchQuery(query);
 
     const profileHeader = document.getElementById("profileFeatureHeader");
     if (profileHeader) {
@@ -426,7 +426,7 @@ searchForm.addEventListener("submit", async (e) => {
 
   // --- Home page search ---
   showHomePage(); // ✅ make section visible first
-  currentSearchQuery = query;
+  setCurrentSearchQuery(query);
   const data = await fetchGifs(currentSearchQuery);
   const favorites = userProfile ? await getFavorites() : [];
   displayGifs(data.data, favorites, true, currentSearchQuery);
@@ -451,10 +451,10 @@ window.addEventListener("resize", () => {
 
 // main.js
 export function resetSearchState() {
-  currentSearchQuery = "";
-  favoritesSearchActive = false;
+  setCurrentSearchQuery("");
+  setFavoritesSearchActive(false);
+  setLastDisplayedGifs([]);
   isSubmittingSearch = false;
-  lastDisplayedGifs = [];
   infiniteScrollEnabled = false;
 
   const searchBar = document.getElementById("searchBar");
