@@ -86,8 +86,10 @@ const loginForm = document.getElementById("loginForm");
 const signupForm = document.getElementById("signupForm");
 const authPopup = document.getElementById("auth-popup");
 
-const themeIcon = document.getElementById("themeIcon");
 const themeSwitch = document.getElementById("themeSwitch");
+const sunIcon = document.querySelector(".sun");
+const moonIcon = document.querySelector(".moon");
+const savedTheme = localStorage.getItem("theme");
 
 // --- Navigation Wrappers ---
 // These wrap UI navigation functions and also reset state variables
@@ -151,24 +153,20 @@ function goAbout() {
 themeSwitch.addEventListener("change", () => {
   if (themeSwitch.checked) {
     document.body.classList.add("dark-mode");
-    themeIcon.textContent = "light_mode"; // show sun when dark
     localStorage.setItem("theme", "dark");
   } else {
     document.body.classList.remove("dark-mode");
-    themeIcon.textContent = "dark_mode"; // show moon when light
     localStorage.setItem("theme", "light");
   }
 });
 
 // ✅ Load saved preference
-const savedTheme = localStorage.getItem("theme");
 if (savedTheme === "dark") {
   document.body.classList.add("dark-mode");
-  if (themeSwitch) themeSwitch.checked = true;
-  if (themeIcon) themeIcon.textContent = "light_mode";
+  themeSwitch.checked = true;
 } else {
-  if (themeSwitch) themeSwitch.checked = false;
-  if (themeIcon) themeIcon.textContent = "dark_mode";
+  document.body.classList.remove("dark-mode");
+  themeSwitch.checked = false;
 }
 
 async function loadMoreGifs(query) {
