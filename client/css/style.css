@@ -1203,41 +1203,38 @@ main,
 
 /* Switch container */
 .switch {
-  position: relative;
-  display: inline-block;
+  display: inline-flex; /* sits inline with other icons */
+  align-items: center; /* vertical centering */
+  justify-content: center;
   width: 44px;
   height: 22px;
+  margin-bottom: 6px;
 }
 
 /* Hide default checkbox */
 .switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
+  display: none;
 }
 
 /* Slider background */
 .slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border-radius: 34px;
-  transition: 0.4s;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  border-radius: 34px;
   padding: 0 5px;
   font-size: 14px;
+  background-color: #4b006e; /* light mode background */
+  border: 1px solid #d9b3ff;
+  position: relative;
 }
 
 /* Light mode appearance */
 body:not(.dark-mode) .slider {
-  background-color: #4b006e; /* dark purple fill */
-  border: 1px solid #d9b3ff; /* light lavender outline */
-  color: #fff;
+  background-color: #d9b3ff;
+  border: 1px solid #4b006e;
 }
 
 body.dark-mode .slider {
@@ -1250,11 +1247,11 @@ body.dark-mode .slider {
 .slider::before {
   content: "";
   position: absolute;
-  height: 15px; /* smaller knob fits track */
+  height: 15px;
   width: 15px;
   left: 3px;
-  top: 50%; /* center vertically */
-  transform: translateY(-50%); /* perfect centering */
+  top: 50%;
+  transform: translateY(-50%);
   background-color: #fff;
   border-radius: 50%;
   transition: 0.4s;
@@ -1262,14 +1259,14 @@ body.dark-mode .slider {
 
 /* Light mode knob */
 body:not(.dark-mode) .slider::before {
-  background-color: #d9b3ff; /* light lavender knob */
+  background-color: #9b4de9; /* light lavender knob */
   border: 1px solid #4b006e; /* dark purple outline */
 }
 
 /* Dark mode knob */
 body.dark-mode .slider::before {
   background-color: #4b006e; /* dark purple knob */
-  border: 1px solid #d9b3ff; /* light lavender outline */
+  border: 1px solid #6f1ebf; /* light lavender outline */
 }
 
 /* Move knob when checked */
@@ -1280,6 +1277,8 @@ body.dark-mode .slider::before {
 /* Icons inside slider */
 .slider .material-symbols-outlined {
   font-size: 14px;
+  flex: 1;
+  text-align: center;
   pointer-events: none;
 }
 
@@ -1334,4 +1333,56 @@ body.dark-mode .slider::before {
   margin: 0.8rem 0;
   font-size: 1rem;
   color: #333; /* darker text for readability */
+}
+
+/* Always show both icons */
+.slider .sun,
+.slider .moon {
+  display: inline-block;
+  width: 50%; /* each takes half the slider */
+  text-align: center; /* center their glyphs */
+  color: inherit;
+}
+
+/* Optional: color difference per theme */
+body:not(.dark-mode) .sun {
+  color: #4b006e; /* purple sun in light mode */
+}
+body:not(.dark-mode) .moon {
+  color: #fff; /* white moon in light mode */
+}
+
+body.dark-mode .sun {
+  color: #2c003e; /* dark sun in dark mode */
+}
+body.dark-mode .moon {
+  color: #4b006e; /* purple moon in dark mode */
+}
+
+/* Dark mode search input readability */
+body.dark-mode .search-box {
+  color: #d820c9 !important; /* white text for visibility */
+}
+
+body.dark-mode .search-box::placeholder {
+  color: #d820c9 !important; /* light gray placeholder */
+}
+
+body.dark-mode .suggestion-item {
+  color: #d820c9 !important; /* light purple text */
+}
+
+body.dark-mode .suggestion-item:hover {
+  background: #4a004a;
+  color: #fff !important; /* white text on hover */
+}
+
+/* Autofill fix for dark mode */
+body.dark-mode input:-webkit-autofill,
+body.dark-mode input:-webkit-autofill:focus,
+body.dark-mode input:-webkit-autofill:active {
+  box-shadow: 0 0 0px 1000px #2c003e inset !important; /* match dark background */
+  -webkit-text-fill-color: #fff !important; /* force white text */
+  border: none !important;
+  outline: none !important;
 }
