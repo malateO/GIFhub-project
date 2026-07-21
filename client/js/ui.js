@@ -193,6 +193,12 @@ export function displayGifs(gifs, favorites, isSearch = false, query = "") {
         }
       });
 
+      // Share button (design only for now)
+      const shareButton = document.createElement("button");
+      shareButton.className = "share-btn material-symbols-outlined";
+      shareButton.textContent = "share"; // icon text
+
+      gifWrapper.appendChild(shareButton);
       gifWrapper.appendChild(favButton);
     }
 
@@ -267,6 +273,13 @@ export async function displayProfileSearchResults(gifs, favorites, query = "") {
       if (isFavorited) favButton.classList.add("active");
 
       favButton.addEventListener("click", () => toggleFavorite(gif));
+
+      // Share button
+      const shareButton = document.createElement("button");
+      shareButton.className = "share-btn material-symbols-outlined";
+      shareButton.textContent = "share";
+
+      gifWrapper.appendChild(shareButton);
       gifWrapper.appendChild(favButton);
     }
 
@@ -422,6 +435,12 @@ async function displayFavoritesSearch(query, offset = 0, limit = 20) {
           }
         });
 
+        // Share button
+        const shareButton = document.createElement("button");
+        shareButton.className = "share-btn material-symbols-outlined";
+        shareButton.textContent = "share";
+
+        gifWrapper.appendChild(shareButton);
         gifWrapper.appendChild(favButton);
       }
 

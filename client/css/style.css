@@ -496,6 +496,37 @@ body {
   animation: pop 0.3s ease;
 }
 
+/* Share button overlay */
+.share-btn {
+  position: absolute;
+  bottom: 8px;
+  right: 50px; /* offset so it sits left of the heart */
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+  z-index: 10;
+}
+
+/* Hover effect (blue tint for share) */
+.share-btn:hover {
+  background: #cce5ff;
+  color: #0066cc;
+}
+
+/* Active state (optional animation like heart) */
+.share-btn.active:hover {
+  background: #e6f2ff;
+  color: #0066cc;
+  animation: pop 0.3s ease;
+}
+
 @keyframes pop {
   0% {
     transform: scale(0.8);
